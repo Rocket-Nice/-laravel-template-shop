@@ -1,0 +1,144 @@
+  2024-06-27 01:13:49 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 01:13:49 App\Notifications\TelegramNotification ... 241.68ms DONE
+  2024-06-27 01:58:35 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 01:58:35 App\Notifications\TelegramNotification ... 179.41ms DONE
+  2024-06-27 03:00:22 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 03:00:22 App\Notifications\TelegramNotification ... 165.07ms DONE
+  2024-06-27 03:00:25 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 03:00:25 App\Notifications\TelegramNotification ... 156.32ms DONE
+  2024-06-27 03:00:31 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 03:00:32 App\Notifications\TelegramNotification ... 192.92ms DONE
+  2024-06-27 03:49:24 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 03:49:24 App\Notifications\TelegramNotification ... 195.40ms DONE
+  2024-06-27 03:49:51 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 03:49:51 App\Notifications\TelegramNotification ... 191.32ms DONE
+  2024-06-27 04:25:01 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 04:25:01 App\Notifications\TelegramNotification ... 181.26ms DONE
+  2024-06-27 05:09:18 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 05:09:18 App\Notifications\TelegramNotification ... 173.38ms DONE
+  2024-06-27 06:00:04 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:04 App\Notifications\TelegramNotification ... 257.55ms DONE
+  2024-06-27 06:00:04 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ... 205.46ms DONE
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ... 226.33ms DONE
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ... 159.89ms DONE
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ... 170.16ms DONE
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ... 262.12ms DONE
+  2024-06-27 06:00:05 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:06 App\Notifications\TelegramNotification ... 369.84ms DONE
+  2024-06-27 06:00:06 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:06 App\Notifications\TelegramNotification ... 193.55ms DONE
+  2024-06-27 06:00:06 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:06 App\Notifications\TelegramNotification ... 175.57ms DONE
+  2024-06-27 06:00:06 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:06 App\Notifications\TelegramNotification ... 245.75ms DONE
+  2024-06-27 06:00:24 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:25 App\Notifications\TelegramNotification ... 183.82ms DONE
+  2024-06-27 06:00:28 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:28 App\Notifications\TelegramNotification ... 225.19ms DONE
+  2024-06-27 06:00:31 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:00:31 App\Notifications\TelegramNotification ... 296.97ms DONE
+  2024-06-27 06:27:56 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:27:56 App\Notifications\TelegramNotification ... 185.48ms DONE
+  2024-06-27 06:30:08 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:30:08 App\Notifications\TelegramNotification ... 151.20ms DONE
+  2024-06-27 06:31:23 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:31:23 App\Notifications\TelegramNotification ... 192.07ms DONE
+  2024-06-27 06:31:35 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:31:36 App\Notifications\TelegramNotification ... 159.50ms DONE
+  2024-06-27 06:31:42 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:31:42 App\Notifications\TelegramNotification ... 155.82ms DONE
+  2024-06-27 06:31:48 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:31:48 App\Notifications\TelegramNotification ... 163.51ms DONE
+  2024-06-27 06:31:54 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:31:54 App\Notifications\TelegramNotification ... 147.62ms DONE
+  2024-06-27 06:32:03 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:32:03 App\Notifications\TelegramNotification ... 147.91ms DONE
+  2024-06-27 06:32:21 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:32:21 App\Notifications\TelegramNotification ... 150.85ms DONE
+  2024-06-27 06:32:39 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:32:39 App\Notifications\TelegramNotification ... 157.80ms DONE
+  2024-06-27 06:32:39 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:32:40 App\Notifications\TelegramNotification ... 169.77ms DONE
+  2024-06-27 06:32:52 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:32:52 App\Notifications\TelegramNotification ... 163.07ms DONE
+  2024-06-27 06:33:07 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:33:07 App\Notifications\TelegramNotification ... 263.67ms DONE
+  2024-06-27 06:33:22 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:33:22 App\Notifications\TelegramNotification ... 178.95ms DONE
+  2024-06-27 06:33:34 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:33:34 App\Notifications\TelegramNotification ... 148.48ms DONE
+  2024-06-27 06:33:43 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:33:44 App\Notifications\TelegramNotification ... 182.92ms DONE
+  2024-06-27 06:33:53 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:33:53 App\Notifications\TelegramNotification ... 177.08ms DONE
+  2024-06-27 06:34:05 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:34:05 App\Notifications\TelegramNotification ... 154.42ms DONE
+  2024-06-27 06:34:17 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:34:17 App\Notifications\TelegramNotification ... 157.58ms DONE
+  2024-06-27 06:34:35 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:34:35 App\Notifications\TelegramNotification ... 152.50ms DONE
+  2024-06-27 06:34:44 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:34:44 App\Notifications\TelegramNotification ... 155.22ms DONE
+  2024-06-27 06:34:53 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:34:54 App\Notifications\TelegramNotification ... 169.53ms DONE
+  2024-06-27 06:35:03 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:35:03 App\Notifications\TelegramNotification ... 151.61ms DONE
+  2024-06-27 06:35:36 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:35:36 App\Notifications\TelegramNotification ... 174.59ms DONE
+  2024-06-27 06:35:45 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:35:45 App\Notifications\TelegramNotification ... 151.61ms DONE
+  2024-06-27 06:55:28 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 06:55:28 App\Notifications\TelegramNotification ... 235.45ms DONE
+  2024-06-27 07:24:17 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 07:24:17 App\Notifications\TelegramNotification ... 180.38ms DONE
+  2024-06-27 07:29:05 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 07:29:05 App\Notifications\TelegramNotification ... 214.61ms DONE
+  2024-06-27 07:37:35 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 07:37:36 App\Notifications\TelegramNotification ... 200.56ms DONE
+  2024-06-27 07:57:42 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 07:57:42 App\Notifications\TelegramNotification ... 174.63ms DONE
+  2024-06-27 08:53:14 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 08:53:14 App\Notifications\TelegramNotification ... 253.23ms DONE
+  2024-06-27 08:53:14 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 08:53:14 App\Notifications\TelegramNotification ... 249.92ms DONE
+  2024-06-27 08:58:32 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 08:58:33 App\Notifications\TelegramNotification ... 187.92ms DONE
+  2024-06-27 09:00:27 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:00:27 App\Notifications\TelegramNotification ... 235.24ms DONE
+  2024-06-27 09:00:39 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:00:39 App\Notifications\TelegramNotification ... 209.94ms DONE
+  2024-06-27 09:05:48 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:05:48 App\Notifications\TelegramNotification ... 239.65ms DONE
+  2024-06-27 09:33:40 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:33:40 App\Notifications\TelegramNotification ... 196.57ms DONE
+  2024-06-27 09:35:10 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:35:11 App\Notifications\TelegramNotification ... 191.47ms DONE
+  2024-06-27 09:35:53 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:35:53 App\Notifications\TelegramNotification ... 183.51ms DONE
+  2024-06-27 09:42:56 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:42:56 App\Notifications\TelegramNotification ... 188.84ms DONE
+  2024-06-27 09:45:32 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:45:32 App\Notifications\TelegramNotification ... 173.99ms DONE
+  2024-06-27 09:45:35 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:45:36 App\Notifications\TelegramNotification ... 172.68ms DONE
+  2024-06-27 09:45:36 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 09:45:36 App\Notifications\TelegramNotification ... 167.69ms DONE
+  2024-06-27 10:08:21 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 10:08:22 App\Notifications\TelegramNotification ... 184.12ms DONE
+  2024-06-27 10:18:19 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 10:18:19 App\Notifications\TelegramNotification ... 407.36ms DONE
+  2024-06-27 10:18:31 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 10:18:31 App\Notifications\TelegramNotification ... 173.61ms DONE
+  2024-06-27 10:30:02 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 10:30:02 App\Notifications\TelegramNotification ... 199.58ms DONE
+  2024-06-27 10:38:23 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 10:38:23 App\Notifications\TelegramNotification ... 172.99ms DONE
+  2024-06-27 10:38:29 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 10:38:29 App\Notifications\TelegramNotification ... 205.65ms DONE
+  2024-06-27 10:43:00 App\Notifications\TelegramNotification ......... RUNNING
+  2024-06-27 10:43:00 App\Notifications\TelegramNotification ... 207.92ms DONE

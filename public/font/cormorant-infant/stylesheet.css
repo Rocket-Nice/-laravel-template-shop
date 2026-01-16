@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Cormorant Infant local';
+    src: url('CormorantInfant-Bold.woff2') format('woff2'),
+        url('CormorantInfant-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+

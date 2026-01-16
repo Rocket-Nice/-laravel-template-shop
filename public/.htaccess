@@ -1,0 +1,38 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    RewriteBase /
+    # Правило для lemousse.shop
+    RewriteCond %{HTTP_HOST} ^lemousse\.shop$ [NC]
+    RewriteRule ^robots\.txt$ robots.txt [L]
+
+    # Правило для le-mousse.ru
+    RewriteCond %{HTTP_HOST} ^le-mousse\.ru$ [NC]
+    RewriteRule ^robots\.txt$ robots2.txt [L]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_expires.c>
+    <FilesMatch "\.(mov|mp4)$">
+        ExpiresActive On
+        ExpiresDefault "access plus 1 month"
+        Header append Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>

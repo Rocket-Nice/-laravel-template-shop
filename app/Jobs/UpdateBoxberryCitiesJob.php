@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Http\Controllers\Shipping\BoxberryController;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+class UpdateBoxberryCitiesJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /**
+     * Create a new job instance.
+     *
+     * @return void
+     */
+    public function __construct($page = 0)
+    {
+        $this->page = $page;
+    }
+
+    private $page;
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+      $result = (new BoxberryController())->updateCities($this->page);
+      return $result;
+    }
+}

@@ -1,0 +1,177 @@
+networks:
+  lemshop_backend:
+    driver: bridge
+# Base PHP service configuration
+x-php: &php
+    image: ${CI_REGISTRY_IMAGE}/cli:${CI_ENVIRONMENT_NAME}-${CI_COMMIT_SHORT_SHA}
+    build:
+        context: .
+        dockerfile: docker/php/Dockerfile.php
+        args:
+            PHP_VERSION: ${PHP_VERSION}
+    environment:
+        TZ: ${APP_TIMEZONE}
+    user: "${UID:-1000}:${GID:-1000}"
+    tty: true
+    restart: ${COMPOSE_RESTART}
+    volumes:
+        - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+        - .:/var/www
+    networks:
+        - lemshop_backend
+    profiles: [ "development", "production" ]
+
+services:
+    php-fpm:
+        image: ${CI_REGISTRY_IMAGE}/api:${CI_ENVIRONMENT_NAME}-${CI_COMMIT_SHORT_SHA}
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile.php-fpm
+            args:
+                PHP_VERSION: ${PHP_VERSION}
+        environment:
+            TZ: ${APP_TIMEZONE}
+        user: "${UID:-1000}:${GID:-1000}"
+        restart: ${COMPOSE_RESTART}
+        volumes:
+            - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+            - .:/var/www
+        networks:
+            - lemshop_backend
+        profiles: [ "development", "production" ]
+
+    php:
+        <<: *php
+        container_name: "${COMPOSE_PROJECT_NAME}_php"
+    
+    php-shedule-run:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule.lock php artisan schedule:run
+     
+    php-mail-queue:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue --stop-when-empty
+    
+    php-mail-queue2:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue2 --stop-when-empty
+    php-mail-queue3:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue3 --stop-when-empty    
+    php-mail-queue4:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue4 --stop-when-empty
+    php-mail-queue5:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue5 --stop-when-empty
+    php-mail-queue6:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue6 --stop-when-empty
+    php-mail-queue7:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue7 --stop-when-empty
+    php-mail-queue8:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue8 --stop-when-empty
+    php-mail-queue9:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue9 --stop-when-empty
+    php-mail-queue10:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1.lock php artisan queue:work --queue=mail_queue10 --stop-when-empty
+    php-compressImages:
+        <<: *php
+        command: timeout 1m php artisan queue:work --queue=compressImages --timeout=1200
+    php-tg-queue-1:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1_tg.lock php artisan queue:work --queue=tg_queue_1 --stop-when-empty
+    php-tg-queue-2:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1_tg.lock php artisan queue:work --queue=tg_queue_2 --stop-when-empty
+    php-tg-queue-3:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1_tg.lock php artisan queue:work --queue=tg_queue_3 --stop-when-empty
+    php-tg-queue-4:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1_tg.lock php artisan queue:work --queue=tg_queue_4 --stop-when-empty
+    php-tg-queue-5:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1_tg.lock php artisan queue:work --queue=tg_queue_5 --stop-when-empty
+    php-tg-queue-6:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1_tg.lock php artisan queue:work --queue=tg_queue_6 --stop-when-empty
+    php-tg-queue-7:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1_tg.lock php artisan queue:work --queue=tg_queue_7 --stop-when-empty
+    php-tg-queue-8:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.schedule1_tg.lock php artisan queue:work --queue=tg_queue_8 --stop-when-empty
+    php-telegram-mailing:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.telegram_mailing.lock php artisan queue:work --queue=telegram_mailing --timeout=600
+    php-export-users:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.export_users.lock php artisan queue:work --queue=export_users --timeout=3600
+    php-export-products:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.export_products.lock php artisan queue:work --queue=export_products --timeout=3600
+    php-export-orders:
+        <<: *php
+        command: flock -n /tmp/lemousse.shop.export_orders.lock php artisan queue:work --queue=export_orders --timeout=3600
+
+    mysql:
+        image: mysql:${MYSQL_VERSION}
+        restart: ${COMPOSE_RESTART}
+        environment:
+            TZ: ${APP_TIMEZONE}
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - ./docker/mysql/data/:/var/lib/mysql       
+        networks:
+            - lemshop_backend
+        profiles: [ "development" ]
+    memcached:
+        image: memcached:${MEMCACHED_VERSION}
+        restart: ${COMPOSE_RESTART}
+        environment:
+            TZ: ${APP_TIMEZONE}
+        command:
+            - --conn-limit=1024
+            - --memory-limit=64
+            - --threads=4
+        networks:
+            - lemshop_backend
+        profiles: [ "development", "production" ]
+    nginx:
+        image: nginx:${NGINX_VERSION}
+        environment:
+            TZ: ${APP_TIMEZONE}
+        volumes:
+            - ./docker/logs/nginx:/var/log/nginx
+            - ./docker/nginx/backend.conf:/etc/nginx/conf.d/default.conf
+            - .:/var/www
+        restart: ${COMPOSE_RESTART}
+        command: [ nginx, '-g', 'daemon off;' ]
+        ports:
+            - "${NGINX_PORT}:80"
+        depends_on:
+            - php-fpm
+        networks:
+            - lemshop_backend
+        profiles: [ "development", "production" ]
+    node:
+        image: node:20-alpine
+        environment:
+            TZ: ${APP_TIMEZONE}
+        user: "${UID:-1000}:${GID:-1000}"
+        tty: true
+        restart: ${COMPOSE_RESTART}
+        volumes:
+            - .:/var/www
+        working_dir: /var/www
+        networks:
+            - lemshop_backend
+        profiles: [ "development", "production" ]

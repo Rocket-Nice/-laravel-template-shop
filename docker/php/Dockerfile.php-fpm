@@ -1,0 +1,45 @@
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}-fpm
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    zip \
+    libfreetype-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libwebp-dev \
+    libxml2-dev \
+    libzip-dev \
+    libzstd-dev \
+    zlib1g-dev \
+    libmemcached-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j$(nproc) \
+    gd \
+    pdo_mysql \
+    mysqli \
+    zip \
+    soap \
+    exif \
+    && pecl install memcached \
+    && docker-php-ext-enable memcached \
+    && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY ./docker/php/php.ini /usr/local/etc/php/php.ini
+
+USER root
+
+# Set working directory
+WORKDIR /var/www
+
+# Ensure correct permissions
+RUN chown -R www-data:www-data /var/www
+
+# Switch to the non-privileged user to run the application
+USER www-data
+
+# Expose port 9000 and start php-fpm server
+EXPOSE 9000

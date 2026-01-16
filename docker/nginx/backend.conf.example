@@ -1,0 +1,47 @@
+server {
+    listen 80;
+    server_name _;
+
+    access_log /var/log/nginx/lm.shop.backend.access.log;
+#    access_log /var/log/nginx/api.lm.shop.json_access.log json_analytics;
+    error_log  /var/log/nginx/lm.shop.backend.error.log warn;
+
+    root /var/www/public/;
+    index index.php;
+
+    location / {
+                #limit_req zone=one burst=5; # nodelay;
+                try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        location /api/ {
+                try_files $uri $uri/ /index.php?$query_string;
+        }
+
+         location ~ \.php$ {
+         fastcgi_pass php-fpm:9000;
+         fastcgi_index index.php;
+         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+         include fastcgi_params;
+     }
+
+    location ~ (/apple-touch-icon(|-\d+x\d+)(|-precomposed)|favicon).png {
+        access_log off;
+        try_files $uri =404;
+        log_not_found off;
+    }
+
+    location ~* \.(jpeg|gif|png|jpg|js|woff|woff2|css|ico|svg|webp)$ {
+        access_log off;
+        expires 90d;
+        add_header Cache-Control "public";
+        sendfile on;
+        tcp_nopush on;
+        sendfile_max_chunk 1m;
+
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
