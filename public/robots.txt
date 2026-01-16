@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /*?page
+Disallow: /*&page
+Disallow: /admin
+Disallow: /cabinet
+Disallow: /order
+Disallow: /payment
+Disallow: /partner
+
+Host: lemousse.shop
