@@ -178,7 +178,7 @@ function changeMethodShipping(event){
 
   shippingInput.value = this_method.value;
   resetShipping();
-  if(shippingCode == 'cdek' || shippingCode == 'boxberry' || shippingCode == 'cdek_courier'){
+  if(shippingCode == 'cdek' || shippingCode == 'yandex' || shippingCode == 'cdek_courier'){
     choosedShippingModule(shippingCode)
   }else if(shippingCode == 'pochta'){
     Fancybox.show(
@@ -292,10 +292,10 @@ document.addEventListener('DOMContentLoaded', function() {
       if (pvz_id.value){
         calculateModule('cdek', pvz_id.value)
       }
-    }else if(shipping == 'boxberry'){
-      const pvz_id = document.getElementById('boxberry-pvz-id')
+    }else if(shipping == 'yandex'){
+      const pvz_id = document.getElementById('yandex-pvz-id')
       if (pvz_id.value){
-        calculateModule('boxberry', pvz_id.value)
+        calculateModule('yandex', pvz_id.value)
       }
     }else if(shipping == 'pochta'){
       const pochtaPostcode = document.getElementById('pochta-postcode')
@@ -389,7 +389,7 @@ function loadRegions(shipping) {
   var country = document.getElementById('country').value;
   if (shipping == 'ozon') {
     var link = myData.getVar('route_getRegions');
-  } else if (shipping == 'boxberry') {
+  } else if (shipping == 'yandex') {
     var link = myData.getVar('route_getBoxberryRegions');
   } else if (shipping == 'cdek') {
     var link = myData.getVar('route_getCdekRegions');
@@ -412,7 +412,7 @@ function loadRegions(shipping) {
         document.getElementById(shipping + '-region').append(option);
         for (var i = 0; i < response.length; i++) {
           var option = document.createElement('option');
-          if (shipping == 'boxberry') {
+          if (shipping == 'yandex') {
             option.value = response[i].id;
             option.innerText = response[i].name;
           } else if (shipping == 'cdek' || shipping == 'cdek_courier') {
@@ -438,7 +438,7 @@ function loadRegions(shipping) {
 function changeRegion(shipping) {
   var blockShippingOzon = document.querySelector('#blockShipping' + shipping);
   var region = blockShippingOzon.querySelector('select[name="region"]').value;
-  if (shipping == 'boxberry') {
+  if (shipping == 'yandex') {
     var link = myData.getVar('route_getBoxberryCities');
   } else if (shipping == 'cdek') {
     var link = myData.getVar('route_getCdekCities');
@@ -454,7 +454,7 @@ function changeRegion(shipping) {
       document.getElementById(shipping + '-cities').innerHTML = '';
       for (var i = 0; i < response.length; i++) {
         var option = document.createElement('option');
-        if (shipping == 'boxberry') {
+        if (shipping == 'yandex') {
           option.value = response[i].id;
           option.innerText = response[i].Name;
         } else if (shipping == 'cdek' || shipping == 'cdek_courier') {
@@ -548,7 +548,7 @@ function changeCity(shipping) {
   var blockShippingOzon = document.querySelector('#blockShipping' + shipping);
   var region = blockShippingOzon.querySelector('select[name="region"]').value;
   var city = blockShippingOzon.querySelector('select[name="city"]').value;
-  if (shipping == 'boxberry') {
+  if (shipping == 'yandex') {
     var link = myData.getVar('route_getBoxberryPvz');
   } else if (shipping == 'cdek') {
     var link = myData.getVar('route_getCdekPvz');
@@ -652,7 +652,7 @@ function map_deliveryVariantIdChange(elem, options = {}) {
 };
 
 function calculateModule(shipping, id) {
-  if (shipping == 'boxberry') {
+  if (shipping == 'yandex') {
     var link = myData.getVar('route_calculateBoxberry');
     var params = {code: id};
   } else if (shipping == 'cdek') {
@@ -663,7 +663,7 @@ function calculateModule(shipping, id) {
   window.ajax.get(link, params, (response) => {
     if (response) {
       var price;
-      if (shipping == 'boxberry') {
+      if (shipping == 'yandex') {
         price = response.shippingPrice;
       } else if (shipping == 'cdek') {
         price = response.shippingPrice;
@@ -763,7 +763,7 @@ window.getTotal = function(){
   var shipping_price_text = document.getElementById('shipping-price-text')
   var shipping_price_info = document.getElementById('shipping-price-info')
   if(shipping){
-    if(shippingPrice == 0 && ['boxberry', 'cdek', 'pochta'].includes(shipping)){
+    if(shippingPrice == 0 && ['yandex', 'cdek', 'pochta'].includes(shipping)){
       // shipping_price_text.textContent = 'Доставка'
       shipping_price_info.innerHTML = window.formatPrice(shippingPrice)
       shipping_price_field.classList.add('hidden')
@@ -790,7 +790,8 @@ window.getTotal = function(){
   if(discount > 0){
     const promoField = document.getElementById('promocode')
     const voucherField = document.getElementById('voucher')
-    if(voucherField.value != '' && promoField.value == ''){
+    const bonusesField = document.getElementById('bonuses')
+    if((!bonusesField || !bonusesField.checked) && voucherField.value != '' && promoField.value == ''){
       // считаем стоимость доставки
       if (shippingPrice > discount) {
         discounted = discount
@@ -815,7 +816,7 @@ window.getTotal = function(){
         <td class="border-b border-black py-4 text-right"><span class="subtitle-1 text-myBrown cormorantInfant">-${formatPrice(discount)}</span></td>
       `
       orderTotalInfo.parentNode.insertBefore(discountInfo, orderTotalInfo);
-    }else if(voucherField.value == '' && promoField.value != ''){
+    }else if((!bonusesField || !bonusesField.checked) && voucherField.value == '' && promoField.value != ''){
       if (getTotalPrice > discount) {
         getTotalPrice = getTotalPrice - discount;
       } else {
@@ -826,6 +827,20 @@ window.getTotal = function(){
       discountInfo.id = 'discount-info'
       discountInfo.innerHTML = `
         <td class="text-left border-b border-black py-4">Промокод</td>
+        <td class="border-b border-black py-4 text-right"><span class="subtitle-1 text-myBrown cormorantInfant">-${formatPrice(discount)}</span></td>
+      `
+      orderTotalInfo.parentNode.insertBefore(discountInfo, orderTotalInfo);
+    }else if(bonusesField && bonusesField.checked && voucherField.value == '' && promoField.value == ''){
+      if (getTotalPrice > discount) {
+        getTotalPrice = getTotalPrice - discount;
+      } else {
+        discount = getTotalPrice - 1;
+        getTotalPrice = 1;
+      }
+      const discountInfo = document.createElement('tr')
+      discountInfo.id = 'discount-info'
+      discountInfo.innerHTML = `
+        <td class="text-left border-b border-black py-4">Баллы</td>
         <td class="border-b border-black py-4 text-right"><span class="subtitle-1 text-myBrown cormorantInfant">-${formatPrice(discount)}</span></td>
       `
       orderTotalInfo.parentNode.insertBefore(discountInfo, orderTotalInfo);
@@ -889,6 +904,9 @@ function promocodeHandler(event){
       window.checkVoucher(code)
     }else if(field.id == 'promocode'){
       window.checkPromocode(code)
+    }else if(field.id == 'bonuses'){
+      console.log('choosedBonuses')
+      window.choosedBonuses(field)
     }
   }else{
     getTotal()
@@ -896,11 +914,12 @@ function promocodeHandler(event){
 }
 const voucherField = document.getElementById('voucher')
 const promocodeField = document.getElementById('promocode')
+const bonusesField = document.getElementById('bonuses')
 if(voucherField){
   voucherField.addEventListener('input', ()=>{
-    if(promocodeField.value != ''){
+    if(promocodeField.value != '' || (bonusesField && bonusesField.checked)){
       promocodeField.value = ''
-      console.log('clear promocodeField');
+      bonusesField.checked = false
       if (document.querySelector('input[name="discount"]')) {
         document.querySelector('input[name="discount"]').remove()
       }
@@ -911,17 +930,16 @@ if(voucherField){
         document.getElementById('promocode-message').remove()
       }
 
-      getTotal(); // предполагается, что этот метод определен в другом месте
+      getTotal();
     }
   })
   voucherField.addEventListener('change', promocodeHandler)
 }
 if(promocodeField){
   promocodeField.addEventListener('input', ()=>{
-    if(voucherField.value != ''){
+    if(voucherField.value != '' || (bonusesField && bonusesField.checked)){
       voucherField.value = ''
-      console.log('clear voucherField');
-      console.log('voucherField', voucherField)
+      bonusesField.checked = false
       if (document.querySelector('input[name="discount"]')) {
         document.querySelector('input[name="discount"]').remove()
       }
@@ -932,12 +950,36 @@ if(promocodeField){
         document.getElementById('promocode-message').remove()
       }
 
-      getTotal(); // предполагается, что этот метод определен в другом месте
+      getTotal();
     }
   })
   promocodeField.addEventListener('change', promocodeHandler)
 }
-
+if(bonusesField){
+  bonusesField.addEventListener('change', (event)=>{
+    if(voucherField.value != ''||promocodeField.value != ''){
+      voucherField.value = ''
+      promocodeField.value = ''
+      if (document.querySelector('input[name="discount"]')) {
+        document.querySelector('input[name="discount"]').remove()
+      }
+      if (document.getElementById('voucher-message')) {
+        document.getElementById('voucher-message').remove()
+      }
+      if (document.getElementById('promocode-message')) {
+        document.getElementById('promocode-message').remove()
+      }
+    }
+    getTotal();
+    promocodeHandler(event)
+  })
+}
+document.addEventListener('DOMContentLoaded', function() {
+  if(promocodeField && promocodeField.value!=''){
+    const change_event = new Event('change')
+    promocodeField.dispatchEvent(change_event)
+  }
+})
 
 window.checkVoucher = function(voucher) {
   const route = myData.getVar('route_checkVoucher')
@@ -1001,6 +1043,7 @@ window.checkVoucher = function(voucher) {
 }
 
 window.checkPromocode = function(promocode) {
+  var cartTotal = Number(document.getElementById('cart-total').value);
   var total_for_discount = Number(document.getElementById('total_for_discount').value)
   if (total_for_discount > 0) {
     const route = myData.getVar('route_checkPromocode')
@@ -1021,7 +1064,7 @@ window.checkPromocode = function(promocode) {
           if (total_for_discount > response.promocode_discount) {
             discount = response.promocode_discount;
           } else {
-            if (total_for_discount < price) {
+            if (total_for_discount < cartTotal) {
               discount = total_for_discount;
             } else {
               discount = total_for_discount - 1;
@@ -1070,7 +1113,41 @@ window.checkPromocode = function(promocode) {
     });
   }
 }
+const userBonuses = document.getElementById('user-bonuses')
+window.choosedBonuses = function(field) {
+  if(!userBonuses || Number(userBonuses.value) < 1){
+    if (document.querySelector('input[name="discount"]')) {
+      document.querySelector('input[name="discount"]').remove()
+    }
+    if (document.getElementById('voucher-message')) {
+      document.getElementById('voucher-message').remove()
+    }
+    if (document.getElementById('promocode-message')) {
+      document.getElementById('promocode-message').remove()
+    }
+    getTotal();
+    return false
+  }
+  var cartTotal = Number(document.getElementById('cart-total').value)
+  var shippingPrice = Number(document.getElementById('shipping-price').value)
+  var discount
+  if (shippingPrice + cartTotal > Number(userBonuses.value)) {
+    discount = Number(userBonuses.value);
+  } else {
+    discount = shippingPrice + cartTotal - 1;
+  }
+  if (!document.querySelector('input[name="discount"]')) {
+    let orderElement = document.getElementById('order');
 
+    let newInput = document.createElement('input');
+    newInput.type = 'hidden';
+    newInput.name = 'discount';
+    newInput.id = 'items-discount';
+    newInput.value = discount;
+    orderElement.prepend(newInput);
+  }
+  getTotal()
+}
 document.querySelectorAll('[name="promo"]').forEach(function(element) {
   element.addEventListener('change', function() {
     let this_val = this.value;

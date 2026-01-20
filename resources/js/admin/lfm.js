@@ -115,10 +115,38 @@ window.choosedFiles = (items) => {
   if (typeof window.target_preview != "undefined"){
     const target_preview = document.getElementById(window.target_preview)
     const input_name = target_preview.dataset.name
-
+    // console.log(input_name);
     //const target_input_thumb = document.getElementById(window.target_input_preview);
     target_preview.innerHTML = "";
-    console.log(items)
+    items.forEach(function (item, index) {
+      const target_input = document.createElement('input')
+      target_input.type = 'hidden'
+      if(items.length > 1){
+        target_input.name = `${input_name}[files][${index}][file]`
+      }else{
+        target_input.name = `${input_name}[file]`
+      }
+      target_input.value = item.url
+      target_preview.appendChild(target_input);
+    });
+    var html = '<ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside mt-2 mb-4">';
+    items.forEach((item) => {
+      html += '<li>' + item.name + '</li>';
+    })
+    html += '</ul>'
+    const fileList = document.createElement('div')
+    fileList.innerHTML = html
+    target_preview.appendChild(fileList);
+   // target_preview.dispatchEvent(new Event("change"));
+  }
+  Fancybox.close();
+}
+window.choosedVideo = (items) => {
+  if (typeof window.target_preview != "undefined"){
+    const target_preview = document.getElementById(window.target_preview)
+    const input_name = target_preview.dataset.name
+    //const target_input_thumb = document.getElementById(window.target_input_preview);
+    target_preview.innerHTML = "";
     items.forEach(function (item, index) {
       const target_input = document.createElement('input')
       target_input.type = 'hidden'

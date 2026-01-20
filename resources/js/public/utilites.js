@@ -1,3 +1,11 @@
+
+export function ymGoal(targetName){
+  if (typeof ym !== 'undefined') {
+    ym(98576494, 'reachGoal', targetName);
+  } else {
+    console.error('Yandex Metrika не инициализирована');
+  }
+}
 export function formatPrice(number) {
   if(!(!isNaN(parseFloat(number)) && isFinite(number) && /^[-+]?\d*\.?\d+$/.test(number))) return '';
   return '<span>'+number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")+'</span> руб.';
@@ -275,12 +283,19 @@ export async function fetchData(url, method = 'GET', data = null, handler = null
   }
 }
 
-export function ymGoal(goal, params = {}) {
-  if (typeof window.ym !== 'function') return;
-
-  try {
-    window.ym(window.YM_ID, 'reachGoal', goal, params);
-  } catch (e) {
-    console.warn('Yandex Metrika goal error:', e);
+export function setCookie(name, value, days, minutes = 0){
+  let expires;
+  if (days === false && minutes > 0){
+    expires = new Date(Date.now() + minutes * 60 * 1000).toUTCString();
+  }else if(days > 0){
+    expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
   }
+  document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+}
+
+export function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
 }

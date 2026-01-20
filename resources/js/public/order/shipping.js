@@ -749,6 +749,8 @@ export class Shipping{
       calculateParams = {type: 'russia', to: this.postcode};
       fetchMethod = 'POST';
     }
+    console.log('calculateParams', calculateParams)
+    console.log('route', route)
     fetchData(route, fetchMethod, calculateParams).then(response => {
       if (!response || (response.shippingPrice !== 0 && !response.shippingPrice && !response.price)) {
         alert('Ошибка расчета стоимости доставки');
@@ -769,7 +771,10 @@ export class Shipping{
       this.setShippingPrice(price);
       getOrderTotal();
 
+      console.log('this.pvz', this.pvz)
+      console.log('this.method', this.method)
       const pvzIdField = document.getElementById(`${this.method}-pvz-id`);
+      console.log('pvzIdField', pvzIdField)
       if(pvzIdField) pvzIdField.value = this.pvz ?? '';
       const pvzAddressField = document.getElementById(`${this.method}-pvz-address`);
       if(pvzAddressField) pvzAddressField.value = this.pvzAddress ?? '';

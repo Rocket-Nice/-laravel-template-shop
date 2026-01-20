@@ -32,7 +32,7 @@ window.starter = () => {
         input.value = localStorage.getItem(name);
       }
     });
-   
+
   }
 }
 window.listenCart = () => {
@@ -58,12 +58,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+export function calculateShippingPrice(){
+  shipping.calculateShippingPrice();
+}
 export function getOrderTotal(){
   if(window.location.pathname !== '/order') return false;
   const discountInfo = document.getElementById('discount-info');
   if(discountInfo){
     discountInfo.remove();
   }
+
   const cartTotal = cart.total;
   let shippingPrice = shipping.price;
 
@@ -113,16 +117,16 @@ export function getOrderTotal(){
       `
       orderTotalInfo.parentNode.insertBefore(discountInfo, orderTotalInfo);
     }else if(discountObject.method === 'bonuses'){
-      if (getTotalPrice > discount) {
-        getTotalPrice = getTotalPrice - discount;
-      } else {
-        discount = getTotalPrice - 1;
-        getTotalPrice = 1;
+      let maxDiscount = Math.ceil(cartTotal * 0.5);
+      discount = discount = Math.min(Number(maxDiscount), discountObject.userBonuses);
+      if(discountObject.discount !== discount){
+        discountObject.setDiscount(discount);
       }
+      getTotalPrice = getTotalPrice - discount;
       const discountInfo = document.createElement('tr')
       discountInfo.id = 'discount-info'
       discountInfo.innerHTML = `
-        <td class="text-left border-b border-black py-4">Бонусные баллы</td>
+        <td class="text-left border-b border-black py-4">Баллы</td>
         <td class="border-b border-black py-4 text-right"><span class="subtitle-1 text-myBrown cormorantInfant">-${formatPrice(discount)}</span></td>
       `
       orderTotalInfo.parentNode.insertBefore(discountInfo, orderTotalInfo);

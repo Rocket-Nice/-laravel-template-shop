@@ -105,17 +105,20 @@ export class Discount{
   onChangeBonuses(e){
     if(this.method !== 'bonuses') this.method = 'bonuses';
     this.resetDiscount();
+    if (!e.target.checked)
+    {
+        return false;
+    }
     if(this.userBonuses < 1){
-      return false;
+        return false;
     }
     let cartTotal = Number(document.getElementById('cart-total').value)
     let shippingPrice = Number(document.getElementById('shipping-price').value)
     let discount;
-    if (shippingPrice + cartTotal > this.userBonuses) {
-      discount = Number(this.userBonuses);
-    } else {
-      discount = shippingPrice + cartTotal - 1;
-    }
+    let maxDiscount = Math.ceil(cartTotal * 0.5);
+    discount = discount = Math.min(Number(maxDiscount), this.userBonuses);
+    // console.log('discount', discount)
+    // console.log('maxDiscount', maxDiscount)
     this.setDiscount(discount);
     getOrderTotal();
   }
@@ -146,7 +149,6 @@ export class Discount{
       params.voucher = this.voucher;
     }
     fetchData(route, 'POST', params).then(response => {
-      console.log('response', response)
       if(!response) alert('Ошибка, попробуйте позже');
       if(response.error){
         this.createMessage(response.error, 'red');

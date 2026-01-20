@@ -1,34 +1,31 @@
-console.log('connect');
 
 // header
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.Fancybox) {
-        if(document.querySelectorAll('[data-fancybox-no-close-btn]').length>0){
-            Fancybox.bind('[data-fancybox-no-close-btn]',{
-                closeButton: false,
-                Toolbar: {
-                display: {
-                    left: [],
-                    middle: [],
-                    right: [],
-                },
-                },
-            });
-            Fancybox.bind('[data-fancybox]',{
-                Thumbs: false,
-                Carousel: {
-                infinite: false,
-                },
-                Toolbar: {
-                display: {
-                    left: [],
-                    middle: [],
-                    right: [],
-                },
-                },
-            });
-        }
-    }
+  if(document.querySelectorAll('[data-fancybox-no-close-btn]').length>0){
+    Fancybox.bind('[data-fancybox-no-close-btn]',{
+      closeButton: false,
+      Toolbar: {
+        display: {
+          left: [],
+          middle: [],
+          right: [],
+        },
+      },
+    });
+    Fancybox.bind('[data-fancybox]',{
+      Thumbs: false,
+      Carousel: {
+        infinite: false,
+      },
+      Toolbar: {
+        display: {
+          left: [],
+          middle: [],
+          right: [],
+        },
+      },
+    });
+  }
 
   window.generatePictureElements();
 
@@ -550,6 +547,13 @@ function ready(f) {
 ready(function () {
   window.onYouTubeIframeAPIReady = function() {}
   if(document.querySelectorAll('.youtube').length > 0){
+    const youtubeScript = document.createElement('script');
+    youtubeScript.type = 'text/javascript';
+    youtubeScript.src = 'https://www.youtube.com/iframe_api';
+
+    // Добавляем скрипт в head
+    document.head.appendChild(youtubeScript);
+
     if (!document.getElementsByClassName) {
       // Поддержка IE8
       var getElementsByClassName = function (node, classname) {
@@ -598,7 +602,45 @@ ready(function () {
       // }
     }
   }
+  if(document.querySelectorAll('.rutube').length > 0){
+    if (!document.getElementsByClassName) {
+      // Поддержка IE8
+      var getElementsByClassName = function (node, classname) {
+        var a = [];
+        var re = new RegExp('(^| )' + classname + '( |$)');
+        var els = node.getElementsByTagName("*");
+        for (var i = 0, j = els.length; i < j; i++)
+          if (re.test(els[i].className)) a.push(els[i]);
+        return a;
+      }
+      var videos = getElementsByClassName(document.body, "rutube");
+    } else {
+      var videos = document.getElementsByClassName("rutube");
+    }
 
+    var nb_videos = videos.length;
+    for (var i = 0; i < nb_videos; i++) {
+      var iframe = document.createElement("iframe");
+      // Rutube использует другой формат URL для встраивания
+      var iframe_url = "https://rutube.ru/play/embed/" + videos[i].id;
+
+      if (videos[i].getAttribute("data-params")) iframe_url += '?' + videos[i].getAttribute("data-params");
+
+      iframe.setAttribute("src", iframe_url);
+      iframe.setAttribute("frameborder", '0');
+      iframe.setAttribute("allowfullscreen", 'allowfullscreen');
+      iframe.setAttribute("webkitallowfullscreen", 'true');
+      iframe.setAttribute("mozallowfullscreen", 'true');
+
+      // Высота и ширина iFrame будет как у элемента-родителя
+      iframe.style.width = videos[i].style.width;
+      iframe.style.height = videos[i].style.height;
+      iframe.id = videos[i].id;
+
+      // Заменяем начальное изображение (постер) на iFrame
+      videos[i].parentNode.replaceChild(iframe, videos[i]);
+    }
+  }
 });
 // gold ticket
 //
@@ -678,3 +720,47 @@ ready(function () {
 //
 // // Проверяем наличие куки goldticket при загрузке страницы
 // document.addEventListener('DOMContentLoaded', goldTicketCheck);
+document.addEventListener('DOMContentLoaded', () => {
+  const phoneInputs = document.querySelectorAll('.phone-mask');
+
+  phoneInputs.forEach(input => {
+    // Обработка вставки текста
+    input.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text');
+      const filteredText = text.replace(/[^\d\s()+\-]/g, '');
+
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const currentValue = input.value;
+
+      input.value = currentValue.slice(0, start) + filteredText + currentValue.slice(end);
+      input.setSelectionRange(start + filteredText.length, start + filteredText.length);
+    });
+
+    // Обработка ввода с клавиатуры
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') return;
+
+      const allowedChars = /[\d\s()+\-]/;
+      if (!allowedChars.test(e.key)) {
+        e.preventDefault();
+      }
+    });
+
+    // Обработка drop события
+    input.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const text = e.dataTransfer.getData('text');
+      const filteredText = text.replace(/[^\d\s()+\-]/g, '');
+
+      const dropPoint = document.caretPositionFromPoint(e.clientX, e.clientY);
+      if (dropPoint) {
+        const start = dropPoint.offset;
+        const currentValue = input.value;
+        input.value = currentValue.slice(0, start) + filteredText + currentValue.slice(start);
+        input.setSelectionRange(start + filteredText.length, start + filteredText.length);
+      }
+    });
+  });
+});

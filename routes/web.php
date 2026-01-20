@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// тест кота
+Route::get('/test-cat-popup', function () {
+  return view('test-cat-popup');
+});
+
 //Route::get('/test-memcached', function() {
 //  $key = 'test_key';
 //  $value = 'Hello, Memcached!';
@@ -30,7 +35,7 @@ use Illuminate\Support\Facades\Route;
 //});
 
 $tg_notification = \App\Models\Setting::query()->where('key', 'tg_notifications_bot')->first();
-Route::post('/tg_webhook/'.($tg_notification->value ?? ''), [\App\Http\Controllers\Admin\TelegramController::class, 'webhook'])->name('tg_webhook');
+Route::post('/tg_webhook/' . ($tg_notification->value ?? ''), [\App\Http\Controllers\Admin\TelegramController::class, 'webhook'])->name('tg_webhook');
 //Route::post('/tg_webhook/'.($tg_notification->value ?? ''), function () {
 //  echo 1;
 //  Log::debug(print_r($_POST, true));
@@ -50,7 +55,7 @@ Route::get('r/{partner}', [App\Http\Controllers\ShortLinkController::class, 'par
 
 Route::get('/link', [\App\Http\Controllers\HomeController::class, 'link']);
 Route::get('/api-documentation', [\App\Http\Controllers\HomeController::class, 'apiDocumentation']);
-Route::middleware(['maintenance'])->group(function(){
+Route::middleware(['maintenance'])->group(function () {
   Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('page.index');
   Route::get('/about-us', [\App\Http\Controllers\HomeController::class, 'index'])->name('page.about');
   Route::get('/celebrities', [\App\Http\Controllers\HomeController::class, 'index'])->name('page.guests');
@@ -66,7 +71,7 @@ Route::middleware(['maintenance'])->group(function(){
   Route::get('/news', [\App\Http\Controllers\HomeController::class, 'blog'])->name('blog.index');
   Route::get('/news/c/{category}', [\App\Http\Controllers\HomeController::class, 'blog_category'])->name('blog.category');
   Route::get('/news/{article}', [\App\Http\Controllers\HomeController::class, 'blog_article'])->name('blog.article');
-// Route::get('/product', [\App\Http\Controllers\ProductController::class, 'index'])->name('product.index');
+  // Route::get('/product', [\App\Http\Controllers\ProductController::class, 'index'])->name('product.index');
   Route::get('/product/{product}', [\App\Http\Controllers\ProductController::class, 'index'])->name('product.index');
   Route::get('/product/{product}/reviews', [\App\Http\Controllers\ProductController::class, 'reviews'])->name('product.reviews');
   Route::get('/present/{product}', [\App\Http\Controllers\ProductController::class, 'present'])->name('product.present');
@@ -76,7 +81,6 @@ Route::middleware(['maintenance'])->group(function(){
   Route::get('/catalog/load', [\App\Http\Controllers\ProductController::class, 'loadProducts'])->name('product.loadProducts');
   Route::get('/catalog/{category}', [App\Http\Controllers\ProductController::class, 'category'])->name('catalog.category');
   Route::get('/our-presents', [\App\Http\Controllers\ProductController::class, 'presents'])->name('product.presents');
-
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -88,8 +92,6 @@ Route::middleware(['auth', 'permission:Доступ в партнерский к
   Route::get('/partner', [\App\Http\Controllers\Partner\HomeController::class, 'index'])->name('partner.cabinet.index');
 });
 
-require __DIR__.'/order.php';
+require __DIR__ . '/order.php';
 
 Route::middleware(['maintenance'])->get('/{page}', [\App\Http\Controllers\PageController::class, 'page'])->name('page');
-
-

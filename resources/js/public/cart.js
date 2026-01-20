@@ -373,22 +373,4 @@ function createCartHtml(cartData){
 }
 
 
-document.addEventListener('DOMContentLoaded', function() {
-  const sizeInputs = document.querySelectorAll('input[name="size"].product-option');
-  console.log('sizeInputs', sizeInputs)
-  let selectedSize = null;
 
-  sizeInputs.forEach(input => {
-    input.addEventListener('change', (e) => {
-      console.log('11')
-      if (e.target.checked) {
-        selectedSize = e.target.value;
-        const button = document.querySelector(e.currentTarget.dataset.button)
-        console.log('button', button)
-        if(button){
-          button.dataset.option = selectedSize
-        }
-      }
-    });
-  });
-});

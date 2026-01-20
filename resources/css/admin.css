@@ -420,3 +420,22 @@ body .lh-base {
 .air-datepicker {
   z-index: 2000;
 }
+
+.td-field {
+  @apply text-sm !ring-0;
+  border: none;
+  background-color: transparent;
+  background-position: right center;
+  display: block;
+  z-index: 2;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  padding-right: 1.5em;
+  margin: 0;
+}
+.td-field.td-input {
+  opacity: 0;
+  border: none;
+  padding: .2rem .2rem;
+}

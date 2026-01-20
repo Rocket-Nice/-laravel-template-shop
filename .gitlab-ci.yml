@@ -1,0 +1,128 @@
+default:
+  tags:
+    - lemousse
+
+variables:
+  GIT_DEPTH: "1"
+  DEPLOY_PORT: 22
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+      variables:
+        ENVIRONMENT: "develop"
+        DEPLOY_USER: "deploy"
+    - if: $CI_COMMIT_BRANCH == "main"
+      variables:
+        ENVIRONMENT: "production"
+        DEPLOY_USER: "deploy"
+
+
+stages:
+#  - test
+  - deploy
+
+# ========== TEST STAGE ==========
+#php-lint:
+#  stage: test
+#  image: $PHP_IMAGE
+#  script:
+#    - ./vendor/bin/pint app/ config/ database/ routes/ --dirty
+
+#javascript-lint:
+#  stage: test
+#  image: node:20-alpine
+#  dependencies:
+#    - install-npm-deps
+#  script:
+#    - npx eslint resources/js --ext .js,.vue
+
+#npm-test:
+#  stage: test
+#  image: node:20-alpine
+#  dependencies:
+#    - install-npm-deps
+#  script:
+#    - npm run test
+#  artifacts:
+#    reports:
+#      junit: reports/jest.xml
+
+# ========== DEPLOY STAGE ==========
+deploy-develop:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | base64 -d | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-add ~/.ssh/id_rsa > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > ~/.ssh/config
+    - chmod 600 ~/.ssh/config
+    - ssh-keyscan $SERVER >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && (git fetch --all || git clone $CI_REPOSITORY_URL .) && git checkout $CI_COMMIT_BRANCH && git reset --hard HEAD && git pull origin $CI_COMMIT_BRANCH || exit 1"
+    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && export NVM_DIR=\"\$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\" && nvm use default && npm i && npm run build || exit 1"
+#    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan migrate --force || exit 1"
+    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan optimize:clear || exit 1"
+  environment: ${ENVIRONMENT}
+  only:
+    - develop
+
+deploy-production:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | base64 -d | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-add ~/.ssh/id_rsa > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > ~/.ssh/config
+    - chmod 600 ~/.ssh/config
+    - ssh-keyscan $SERVER >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && (git fetch --all || git clone $CI_REPOSITORY_URL .) && git checkout $CI_COMMIT_BRANCH && git reset --hard HEAD && git pull origin $CI_COMMIT_BRANCH || exit 1"
+    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && export NVM_DIR=\"\$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\" && nvm use default && npm i && npm run build || exit 1"
+#    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan migrate --force || exit 1"
+    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan optimize:clear || exit 1"
+  environment: ${ENVIRONMENT}
+  only:
+    - main
+  when: manual
+
+# Health check template
+.health-check-template: &health-check-definition
+  stage: deploy
+  image: alpine:latest
+  script:
+    - apk add --no-cache curl
+    - |
+      for i in {1..10}; do
+        if curl -f https://$WEBADDRESS/health; then
+          echo "Health check passed"
+          exit 0
+        fi
+        sleep 10
+      done
+      echo "Health check failed"
+      exit 1
+  environment: ${ENVIRONMENT}
+
+health-check-production:
+  <<: *health-check-definition
+  only:
+    - main
+  needs:
+    - job: deploy-production
+
+health-check-develop:
+  <<: *health-check-definition
+  only:
+    - develop
+  needs:
+    - job: deploy-develop

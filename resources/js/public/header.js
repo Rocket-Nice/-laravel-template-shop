@@ -70,12 +70,15 @@ document.addEventListener('DOMContentLoaded', function () {
       if (button.dataset.field) {
         button.addEventListener('click', (e) => {
           let elem = e.target
+          let form = elem.closest('form')
           if (!elem.matches('button')) {
             elem = elem.closest('button')
           }
           const field = document.getElementById(elem.dataset.field)
           if (field.value == '') {
             field.focus()
+          }else{
+            form.submit()
           }
         })
       }
@@ -110,10 +113,30 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="relative group dropdown">
           <button class="nav-parent h-[38px] flex items-center w-full">
             <span>${parentLink.textContent}</span>
-            <img src="${parentLink.querySelector('img').getAttribute('src')}" alt="${parentLink.querySelector('img').getAttribute('alt')}" class="nav-arrow ml-[6px] transform">
+            <svg class="nav-arrow ml-[6px] transform" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g filter="url(#filter0_b_1918_1487)">
+                <path d="M3 5.96202L8 10.916L13 5.96202L12.1125 5.08268L8 9.15735L3.8875 5.08268L3 5.96202Z" fill="currentColor"/>
+              </g>
+              <defs>
+                <filter id="filter0_b_1918_1487" x="-32" y="-32" width="80" height="80" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                  <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                  <feGaussianBlur in="BackgroundImageFix" stdDeviation="16"/>
+                  <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_1918_1487"/>
+                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_1918_1487" result="shape"/>
+                </filter>
+              </defs>
+            </svg>
           </button>
           <div class="dropdown-content hidden rounded-lg space-y-3 mt-3 pl-4">
-            ${Array.from(dropdownLinks).map(link => `<a href="${link.getAttribute('href')}" class="nav-link flex items-center">${link.textContent}</a>`).join('')}
+            ${Array.from(dropdownLinks).map(link => {
+        const href = link.getAttribute('href');
+        const onClick = link.getAttribute('onclick');
+        let linkAttributes = `href="${href}" class="nav-link flex items-center"`;
+        if (onClick) {
+          linkAttributes += ` onclick="${onClick}"`;
+        }
+        return `<a ${linkAttributes}>${link.textContent}</a>`;
+      }).join('')}
           </div>
         </div>
       `;

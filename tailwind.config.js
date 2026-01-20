@@ -106,6 +106,10 @@ module.exports = {
                 taplinkGrey3: '#f1f0ee',
                 taplinkGrey4: '#818180',
                 happyBDRed: '#b3535f',
+            },
+            inset: {
+                '18': '4.5rem',
+                '-18': '-4.5rem',
             }
         },
 

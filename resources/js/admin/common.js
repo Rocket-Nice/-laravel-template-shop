@@ -334,7 +334,7 @@ function stringToDate(dateString){
     return null;
   }
 }
-function datepickerInit(elem, options = {}) {
+window.datepickerInit = (elem, options = {}) => {
   const datepickerParams = {
     ...options,
     timepicker: true,
@@ -363,6 +363,7 @@ function datepickerInit(elem, options = {}) {
     datepickerParams.timepicker = false;
   }
   new AirDatepicker(elem, datepickerParams)
+  elem.classList.add('datepicker-started');
 }
 var datepickerFields = document.querySelectorAll('input.datepicker');
 datepickerFields.forEach((field)=>{
@@ -777,8 +778,8 @@ coosePvzButtons.forEach((button)=>{
 function choosedShippingModule(shipping){
   if (!document.querySelector('#blockShipping' + shipping)) {
     var shippingName;
-    if (shipping == 'boxberry') {
-      shippingName = 'Boxberry доставка';
+    if (shipping == 'yandex') {
+      shippingName = 'Яндекс доставка';
     } else if (shipping == 'cdek') {
       shippingName = 'Доставка СДЭК';
     } else if (shipping == 'cdek_courier') {
@@ -845,7 +846,7 @@ function loadRegions(shipping) {
   var country = document.getElementById('country').value;
   if (shipping == 'ozon') {
     var link = myData.getVar('route_getRegions');
-  } else if (shipping == 'boxberry') {
+  } else if (shipping == 'yandex') {
     var link = myData.getVar('route_getBoxberryRegions');
   } else if (shipping == 'cdek') {
     var link = myData.getVar('route_getCdekRegions');
@@ -868,7 +869,7 @@ function loadRegions(shipping) {
           if (shipping == 'ozon') {
             option.value = response[i].id;
             option.innerText = response[i].name;
-          } else if (shipping == 'boxberry') {
+          } else if (shipping == 'yandex') {
             option.value = response[i].id;
             option.innerText = response[i].name;
           }  else if (shipping === 'x5post') {
@@ -926,7 +927,7 @@ function loadRegions(shipping) {
 function changeRegion(shipping) {
   var blockShippingOzon = document.querySelector('#blockShipping' + shipping);
   var region = blockShippingOzon.querySelector('select[name="region"]').value;
-  if (shipping == 'boxberry') {
+  if (shipping == 'yandex') {
     var link = myData.getVar('route_getBoxberryCities');
   } else if (shipping == 'cdek') {
     var link = myData.getVar('route_getCdekCities');
@@ -943,7 +944,7 @@ function changeRegion(shipping) {
         if (shipping == 'ozon') {
           option.value = response[i].id;
           option.innerText = response[i].name;
-        } else if (shipping == 'boxberry') {
+        } else if (shipping == 'yandex') {
           option.value = response[i].id;
           option.innerText = response[i].Name;
         } else if (shipping === 'x5post') {
@@ -1032,7 +1033,7 @@ function changeCity(shipping) {
   var blockShippingOzon = document.querySelector('#blockShipping' + shipping);
   var region = blockShippingOzon.querySelector('select[name="region"]').value;
   var city = blockShippingOzon.querySelector('select[name="city"]').value;
-  if (shipping == 'boxberry') {
+  if (shipping == 'yandex') {
     var link = myData.getVar('route_getBoxberryPvz');
   } else if (shipping == 'cdek') {
     var link = myData.getVar('route_getCdekPvz');
@@ -1162,8 +1163,8 @@ function ozl_deliveryVariantIdChange(elem) {
 };
 
 function calculateModule(shipping, id, address, city = false, city_name = null) {
-  if (shipping == 'boxberry') {
-    var shippingName = 'Boxberry доставка';
+  if (shipping == 'yandex') {
+    var shippingName = 'Яндекс доставка';
     var params = {code: id};
   } else if (shipping == 'cdek') {
     var shippingName = 'Доставка СДЭК';

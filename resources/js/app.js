@@ -1,9 +1,53 @@
 import './bootstrap';
-
+import { Fancybox } from "@fancyapps/ui";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import Alpine from 'alpinejs';
 
+window.Fancybox = Fancybox;
 window.Alpine = Alpine;
 
+
+Alpine.data('formHandler', () => ({
+  isSubmitting: false,
+  showSuccess: false,
+  showError: false,
+
+  async submitForm(form) {
+    this.isSubmitting = true;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(form.action || window.location.href, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        this.showSuccess = true;
+        Fancybox.show(
+          [{
+            src: '#form-success'
+          }],
+          {
+            closeButton: false,
+            loop: false,
+            touch: false,
+            contentClick: false,
+            dragToClose: false,
+          }
+        );
+        form.reset();
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      window.alert(error.message);
+      this.showError = true;
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+}));
 Alpine.data('surveyHandler', () => ({
   currentQuestion: null,
   button: 'Далее',
@@ -159,6 +203,7 @@ Alpine.data('surveyHandler', () => ({
 Alpine.data('headerData', () => ({
   open: false,
   showHeader: false,
+  fixedHeader: true,
   lastScrollTop: 0,
   scrollThreshold: 200,
   init() {
@@ -172,6 +217,9 @@ Alpine.data('headerData', () => ({
   handleScroll() {
     let st = window.pageYOffset || document.documentElement.scrollTop;
 
+    if(window.innerWidth < 1024){
+      this.fixedHeader = st > 0
+    }
     if (st < this.scrollThreshold && window.innerWidth > 1024) {
       this.showHeader = false;
       this.lastScrollTop = st <= 0 ? 0 : st;
@@ -332,6 +380,50 @@ textareaFields.forEach((textarea) => {
     autoResize(this);
   });
 })
+// Функция для настройки observer'а
+function setupScrollObserver() {
+  // Находим все элементы с атрибутом data-onload
+  const elements = document.querySelectorAll('[data-onload]');
+  if(!elements.length) return false;
+  // Настройки для observer'а
+  const options = {
+    root: null, // viewport
+    rootMargin: '300px', // триггер за 300px до элемента
+    threshold: 0 // сработает, как только элемент начнет появляться
+  };
+
+  // Создаем observer
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const element = entry.target;
+        const functionName = element.dataset.onload;
+
+        // Проверяем существование функции
+        if (typeof window[functionName] === 'function') {
+          // Вызываем функцию
+          window[functionName]();
+          // Отключаем наблюдение после первого срабатывания
+          observer.unobserve(element);
+        } else {
+          console.warn(`Function ${functionName} is not defined`);
+        }
+      }
+    });
+  }, options);
+
+
+
+  // Добавляем их в observer
+  elements.forEach(element => {
+    observer.observe(element);
+  });
+}
+
+// Запускаем после загрузки DOM
+document.addEventListener('DOMContentLoaded', setupScrollObserver);
+
+
 
 import './helper';
 import './public/common';
@@ -340,3 +432,4 @@ import './public/product';
 // import './public/cart';
 // import './public/order';
 import './public/starter';
+import './public/popups';

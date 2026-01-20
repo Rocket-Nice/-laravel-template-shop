@@ -233,11 +233,13 @@ body .lh-base {
   height: 100%;
   margin: 0;
 }
-
 .item-square:after {
   content: "";
   display: block;
   padding-top: 100%;
+}
+.cart-item .item-square:after{
+  padding-top: 121.925133%;
 }
 .item-square.square-0\.14:after {
   content: "";
@@ -341,7 +343,7 @@ body .lh-base {
     padding-top: 112.82051282%;
   }
   .item-square.orderImage:after {
-    padding-top: 112.82051282%;
+    padding-top: 46.15384615%;
   }
 
   .item-square.imgforWhat1:after {
@@ -386,7 +388,7 @@ body .lh-base {
     padding-top: 91.94139194%;
   }
   .item-square.orderImage:after {
-    padding-top: 46.15384615%;
+    padding-top: 91.94139194%;
   }
   .item-square.uniqueWorkingRecipes:after {
     padding-top: 68.18181818%;

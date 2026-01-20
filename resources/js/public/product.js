@@ -479,11 +479,11 @@ function createProductItem(product){
     }
 
     if(product.tag20 === "1"){
-      newStructure += `<div class="flex-1 flex justify-end"> <img src="https://lemousse.shop/img/bf-1125/tag-20.jpg" alt="" style="width: 50px; " class="block"></div>`;
+      newStructure += `<div class="flex-1 flex justify-end"> <div class="flex items-center text-myDark bg-white text-sm py-1 px-1 leading-none border border-myDark cormorantInfant">-20%</div></div>`;
     }else if(product.tag30 === "1"){
-      newStructure += `<div class="flex-1 flex justify-end"> <img src="https://lemousse.shop/img/bf-1125/tag-30.jpg" alt="" style="width: 50px; " class="block"></div>`;
+      newStructure += `<div class="flex-1 flex justify-end"> <div class="flex items-center text-myDark bg-white text-sm py-1 px-1 leading-none border border-myDark cormorantInfant">-30%</div></div>`;
     }else if(product.tag50 === "1"){
-      newStructure += `<div class="flex-1 flex justify-end"> <img src="https://lemousse.shop/img/bf-1125/tag-50.jpg" alt="" style="width: 50px; " class="block"></div>`;
+      newStructure += `<div class="flex-1 flex justify-end"> <div class="flex items-center text-myDark bg-white text-sm py-1 px-1 leading-none border border-myDark cormorantInfant">-50%</div></div>`;
     }
     firstSlideHtml.innerHTML = `${soldOut}<div x-data="{ open: false }" :class="open ? '' : 'absolute'" class="z-10 top-2 right-1 flex flex-col space-y-0.5">${refillSticker}${newStructure}</div>`;
   }

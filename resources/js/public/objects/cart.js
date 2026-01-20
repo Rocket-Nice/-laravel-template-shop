@@ -1,5 +1,5 @@
 import {formatPrice, ymGoal} from "../utilites.js"
-import {/*calculateShippingPrice,*/ getOrderTotal} from "../starter.js";
+import {calculateShippingPrice, getOrderTotal} from "../starter.js";
 export class Cart {
   constructor() {
     this.count;
@@ -267,7 +267,7 @@ export class Cart {
       cartItem.dataset.quantity = item.qty;
 
       let itemImage = `
-        <div class="w-[86px] h-[86px] mr-4 md:mr-6"><div class="item-square">
+        <div class="w-[86px] mr-4 md:mr-6"><div class="item-square">
           <img src="${item.options.image}" alt="${item.name}" class="object-bottom object-cover block"></div>
         </div>
       `
@@ -281,7 +281,7 @@ export class Cart {
           <div>
             <h3 class="text-2xl lg:text-32 font-light">${item.name}</h3>${subtitle}
             <div class="text-base lg:text-lg my-4">Артикул: ${item.options.sku}</div>
-            ${item.options.old_price ? `<div data-da=".mobile-cart-info-{{ $item->rowId }},first,1023" class="text-base sm:text-md md:text-lg cormorantInfant italic font-semibold text-myGray line-through">${window.formatPrice(item.options.old_price * item.qty, true)}</div>` : ''}
+            ${item.options.old_price ? `<div data-da=".mobile-cart-info-${rowId},first,1023" class="text-base sm:text-md md:text-lg cormorantInfant italic font-semibold text-myGray line-through">${window.formatPrice(item.options.old_price * item.qty, true)}</div>` : ''}
             <div class="subtitle-1 text-myBrown" data-da=".mobile-cart-info-${rowId},last,1023">${window.formatPrice(item.price * item.qty, true)}</div>
           </div>
         </div>
@@ -358,7 +358,7 @@ export class Cart {
         let cartItem = document.createElement('div');
         cartItem.className = 'border-b border-black pb-6 mb-6'
         cartItem.innerHTML = `<div class="flex">
-                      <div class="w-[86px] h-[86px] mr-4 md:mr-6">
+                      <div class="w-[86px] mr-4 md:mr-6">
                         <div class="item-square bg-springGreen">
                           <div class="flex justify-center-items-center p-4">
                             <img src="/img/happy_coupon/cabinet-gift.png" class="object-bottom object-cover block">
@@ -392,12 +392,12 @@ export class Cart {
       }
     }else{ //  if(window.promo30)
       let need_to_keys = '';
-      if (this.count < 3) {
-        need_to_keys = `Добавьте ещё ${denum(3 - this.count, ['<span style="font-style:italic;line-height:0;font-size:2.5em;">%d</span> позицию', '<span style="font-style:italic;line-height:0;font-size:2.5em;">%d</span> позиции', '<span style="font-style:italic;line-height:0;font-size:2.5em;">%d</span> позиций'])} в корзину и получите бесплатную доставку!`;
-      } else{
-        need_to_keys = 'Ваша доставка будет бесплатной!*';
-      }
-      document.getElementById('coupons-content').innerHTML = need_to_keys;
+      // if (this.count < 3) {
+      //   need_to_keys = `Добавьте ещё ${denum(3 - this.count, ['<span style="font-style:italic;line-height:0;font-size:2.5em;">%d</span> позицию', '<span style="font-style:italic;line-height:0;font-size:2.5em;">%d</span> позиции', '<span style="font-style:italic;line-height:0;font-size:2.5em;">%d</span> позиций'])} в корзину и получите бесплатную доставку!`;
+      // } else{
+      //   need_to_keys = 'Ваша доставка будет бесплатной!*';
+      // }
+      // document.getElementById('coupons-content').innerHTML = need_to_keys;
       if(need_to_keys === ''){
         document.getElementById('coupons-info').style.display = 'none';
       }else{
@@ -407,7 +407,7 @@ export class Cart {
     document.getElementById('cart-total').value = this.total;
     document.getElementById('cart-count').value = this.count;
     document.getElementById('total_for_discount').value = totalForDiscount;
-    //calculateShippingPrice();
+    calculateShippingPrice();
     getOrderTotal();
     table.dispatchEvent(new CustomEvent('updateCart', {
       detail: {},

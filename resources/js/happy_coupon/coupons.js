@@ -214,6 +214,22 @@ export class HappyCoupon {
         btn.removeAttribute('onclick');
         btn.setAttribute('href', window.hpRoutes.cabinet);
         btn.innerHTML = '<span class="text">Личный кабинет</span>';
+        if(document.getElementById('instaPromo-success') && this.attemptsLeft === 0){
+          Fancybox.show(
+            [
+              {
+                src: '#instaPromo-success'
+              },
+            ],
+            {
+              closeButton: false,
+              loop: false,
+              touch: false,
+              contentClick: false,
+              dragToClose: false,
+            }
+          );
+        }
       }
     }, 200);
   }
@@ -274,14 +290,14 @@ export class HappyCoupon {
       setTimeout(() => {
         this.isProcessing = false;
         link.style.display = 'inline-flex';
-
-        if (this.attemptsLeft === 0) {
-          link.removeAttribute('onclick');
-          link.setAttribute('href', window.hpRoutes.cabinet);
-          link.innerHTML = '<span class="text">Личный кабинет</span>';
-        }else{
-          link.querySelector('.text').textContent = 'Далее';
-        }
+        link.querySelector('.text').textContent = 'Далее';
+        // if (this.attemptsLeft === 0) {
+        //   link.removeAttribute('onclick');
+        //   link.setAttribute('href', window.hpRoutes.cabinet);
+        //   link.innerHTML = '<span class="text">Личный кабинет</span>';
+        // }else{
+        //   link.querySelector('.text').textContent = 'Далее';
+        // }
       }, start);
 
     } catch (error) {
@@ -292,25 +308,9 @@ export class HappyCoupon {
   updateAttempts(attempts) {
     this.attemptsLeft = attempts;
     document.getElementById('attempts').textContent = attempts;
-    if(document.getElementById('instaPromo-success') && attempts === 0){
-      Fancybox.show(
-        [
-          {
-            src: '#instaPromo-success'
-          },
-        ],
-        {
-          closeButton: false,
-          loop: false,
-          touch: false,
-          contentClick: false,
-          dragToClose: false,
-        }
-      );
-    }
   }
 
-  getElementPosition(element) {
+  YНgetElementPosition(element) {
     return {
       x: element.offsetLeft,
       y: element.offsetTop

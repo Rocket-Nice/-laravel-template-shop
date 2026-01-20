@@ -2,10 +2,13 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
-        "php": "^8.0.2",
+        "php": "8.1.9",
         "antistress-store/cdek-sdk-v2": "^1.1",
         "doctrine/dbal": "^3.6",
         "endroid/qr-code": "^5.0",
@@ -81,10 +84,6 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true
-        },
-        "audit": {
-            "ignore": ["*"],
-            "block-insecure": false
         }
     },
     "minimum-stability": "stable",

@@ -11,10 +11,9 @@ class Setting extends Model
 {
     use HasFactory, QueryCacheable, Loggable;
 
-//   public $cacheFor = 3600 * 24;
+    //   public $cacheFor = 3600 * 24;
 
-//   public $cacheDriver = 'memcached';
-    // public $cacheDriver = 'file';
+    //   public $cacheDriver = 'memcached';
 
     protected $casts = [
         'data' => 'array'
