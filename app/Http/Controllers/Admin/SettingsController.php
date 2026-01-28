@@ -57,6 +57,7 @@ class SettingsController extends Controller
           'promo_1+1=3',
           'payment_test',
           'happyCoupon',
+          'catInBag',
           'puzzlesStatus',
           'paymentMethod',
           'diamondPromo1',

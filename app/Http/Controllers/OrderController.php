@@ -525,72 +525,49 @@ class OrderController extends Controller
             }
         }
         $slug = getCode(4);
-        $retult_total = $total + $shipping_price;
+        $result_total = $total + $shipping_price;
         if ($discount > 0) {
             if (isset($promocode['promocode_discount']) && $price_for_discount > 0) {
                 if ($price_for_discount == $total) {
-                    $retult_total = $price_for_discount - $discount;
+                    $result_total = $price_for_discount - $discount;
 
-                    if ($retult_total <= 0) {
-                        $retult_total = 1 + $shipping_price;
+                    if ($result_total <= 0) { // Товар 0 рублей (символично ставим 1рубль)
+                        $result_total = $shipping_price + 1;
                     } else {
-                        $retult_total += $shipping_price;
+                        $result_total += $shipping_price;
                     }
                 } else {
                     $total -= $price_for_discount;
-                    $retult_total = $price_for_discount - $discount;
+                    $result_total = $price_for_discount - $discount;
 
-                    if ($retult_total < 0) {
-                        $retult_total = 0;
+                    if ($result_total < 0) {
+                        $result_total = 0;
                     }
-                    $retult_total += $total + $shipping_price;
+                    $result_total += $total + $shipping_price;
                 }
             } elseif (isset($voucher['voucher_discount'])) {
-                $retult_total = $total + $shipping_price - $discount;
-                if ($retult_total <= 0) {
-                    $retult_total = 1;
+                $result_total = $total + $shipping_price - $discount;
+                if ($result_total <= 0) {
+                    $result_total = 1;
                 }
             } elseif ($userBonuses > 0 && $request->bonuses) {
-                //$retult_total = $total + $shipping_price - $discount;
-                //if($retult_total <= 0){
-                //  $retult_total = 1;
-                //}
+                $maxDiscountFromBunus = $price_for_discount / 2;
+                $correctDiscount = ($maxDiscountFromBunus > $discount) ? $discount : $maxDiscountFromBunus;
 
                 if ($price_for_discount == $total) {
-                    $maxDiscountFromBunus = $price_for_discount / 2;
-
-                    if ($maxDiscountFromBunus > $discount) {
-                        $correctDiscount = $discount;
-                    } else {
-                        $correctDiscount = $maxDiscountFromBunus;
-                    }
-
-                    $retult_total -= $correctDiscount;
-
-                    if ($retult_total <= 0) {
-                        $retult_total = 1 + $shipping_price;
-                    } else {
-                        $retult_total += $shipping_price;
+                    $result_total -= $correctDiscount;
+                    if ($result_total <= 0) { // если сумма 0 рублей (символично ставим 1рубль)
+                        $result_total = 1;
                     }
                 } else {
-                    $maxDiscountFromBunus = $price_for_discount / 2;
+                    $result_total = $price_for_discount - $correctDiscount;
 
-                    if ($maxDiscountFromBunus > $discount) {
-                        $correctDiscount = $discount;
-                    } else {
-                        $correctDiscount = $maxDiscountFromBunus;
-                    }
-
-                    $total -= $price_for_discount;
-
-                    $retult_total = $price_for_discount - $correctDiscount;
-
-                    if ($retult_total < 0) {
-                        $retult_total = 0;
+                    if ($result_total < 0) { // если сумма 0 рублей (символично ставим 1рубль)
+                        $result_total = 1;
                     }
                 }
             }
-            $discount_total = $total + $shipping_price - $retult_total;
+            $discount_total = $total + $shipping_price - $result_total;
             $data['discount'] = $discount_total;
         }
         $order = Order::create([
@@ -598,7 +575,7 @@ class OrderController extends Controller
             'data' => $data,
             'data_cart' => $data_cart,
             'data_shipping' => $data_shipping,
-            'amount' => $retult_total,
+            'amount' => $result_total,
             'confirm' => 0,
             'slug' => $slug,
             'partner_id' => $partner ?? null,

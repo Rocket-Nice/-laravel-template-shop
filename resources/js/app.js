@@ -72,46 +72,46 @@ Alpine.data('surveyHandler', () => ({
   },
   previousQuestion() {
     this.currentQuestion--;
-    if(this.questions[this.currentQuestion].elem.querySelector('.required') && this.questions[this.currentQuestion].elem.dataset.type === 'radio'){
-      if (!this.validateCurrentQuestion()){
+    if (this.questions[this.currentQuestion].elem.querySelector('.required') && this.questions[this.currentQuestion].elem.dataset.type === 'radio') {
+      if (!this.validateCurrentQuestion()) {
         return false;
       }
     }
     this.nextButton = true;
   },
   nextQuestion() {
-    if(this.currentQuestion < this.questions.length-1){
-      if(this.questions[this.currentQuestion].elem.querySelector('.required') && this.questions[this.currentQuestion].elem.dataset.type === 'radio'){
-        if (!this.validateCurrentQuestion()){
+    if (this.currentQuestion < this.questions.length - 1) {
+      if (this.questions[this.currentQuestion].elem.querySelector('.required') && this.questions[this.currentQuestion].elem.dataset.type === 'radio') {
+        if (!this.validateCurrentQuestion()) {
           return false;
         }
       }
       this.currentQuestion++
-      if(this.currentQuestion === this.questions.length-1){
+      if (this.currentQuestion === this.questions.length - 1) {
         this.button = 'Отправить анкету'
-      }else{
+      } else {
         this.button = 'Далее'
       }
-      if (!this.validateCurrentQuestion() && this.questions[this.currentQuestion].elem.querySelector('.required')){
+      if (!this.validateCurrentQuestion() && this.questions[this.currentQuestion].elem.querySelector('.required')) {
         this.nextButton = false;
       }
 
-    }else{
+    } else {
       this.validateAndSubmit()
     }
   },
-  questionChange(){
-    if (!this.validateCurrentQuestion()){
+  questionChange() {
+    if (!this.validateCurrentQuestion()) {
       return false;
     }
     this.questions[this.currentQuestion].is_answered = true;
     this.nextButton = true;
     let score = Number(this.$el.value);
     let commentField = this.$el.closest('.questions-item').querySelector('.question-comment');
-    if(commentField) {
-      if(score <= 8){
+    if (commentField) {
+      if (score <= 8) {
         commentField.style.display = null;
-      }else{
+      } else {
         commentField.style.display = 'none';
       }
 
@@ -120,9 +120,9 @@ Alpine.data('surveyHandler', () => ({
 
     console.log('this.$el.value', this.$el.value)
   },
-  validateCurrentQuestion(){
+  validateCurrentQuestion() {
     const group = this.questions[this.currentQuestion].elem.querySelectorAll('input[type="radio"]')
-    if (!this.isRadioGroupValid(group)){
+    if (!this.isRadioGroupValid(group)) {
       return false;
     }
     return true;
@@ -217,7 +217,7 @@ Alpine.data('headerData', () => ({
   handleScroll() {
     let st = window.pageYOffset || document.documentElement.scrollTop;
 
-    if(window.innerWidth < 1024){
+    if (window.innerWidth < 1024) {
       this.fixedHeader = st > 0
     }
     if (st < this.scrollThreshold && window.innerWidth > 1024) {
@@ -307,12 +307,12 @@ Alpine.data('productsLoader', (initialFilters = {}) => ({
         if (data.data.length < 10) {
           this.noMoreProducts = true;
         }
-        setTimeout(()=>{
+        setTimeout(() => {
 
           this.initSwiper();
           let tooltipListener = new CustomEvent('tooltipListener');
           window.dispatchEvent(tooltipListener);
-        },100)
+        }, 100)
       })
       .catch(error => {
         console.error('Error loading products:', error);
@@ -356,12 +356,12 @@ Alpine.data('productsLoader', (initialFilters = {}) => ({
   },
 
   btnTooltipListener() {
-      const btnTooltips = document.querySelectorAll('.btn-tooltip');
-      btnTooltips.forEach((btn) => {
-        btn.removeEventListener('click', btnTooltipListenerHandler);
-        btn.addEventListener('click', btnTooltipListenerHandler);
-      });
-    }
+    const btnTooltips = document.querySelectorAll('.btn-tooltip');
+    btnTooltips.forEach((btn) => {
+      btn.removeEventListener('click', btnTooltipListenerHandler);
+      btn.addEventListener('click', btnTooltipListenerHandler);
+    });
+  }
 }))
 
 Alpine.start();
@@ -376,7 +376,7 @@ function autoResize(textarea) {
 const textareaFields = document.querySelectorAll('textarea.auto-height');
 
 textareaFields.forEach((textarea) => {
-  textarea.addEventListener('input', function() {
+  textarea.addEventListener('input', function () {
     autoResize(this);
   });
 })
@@ -384,7 +384,7 @@ textareaFields.forEach((textarea) => {
 function setupScrollObserver() {
   // Находим все элементы с атрибутом data-onload
   const elements = document.querySelectorAll('[data-onload]');
-  if(!elements.length) return false;
+  if (!elements.length) return false;
   // Настройки для observer'а
   const options = {
     root: null, // viewport
@@ -433,3 +433,4 @@ import './public/product';
 // import './public/order';
 import './public/starter';
 import './public/popups';
+import './public/animationCat';

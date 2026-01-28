@@ -110,6 +110,21 @@ Route::name('admin.')->group(function () {
   Route::middleware(['permission:Управление кодами магазинов для СК'])->group(function () {
     Route::get('/happy-coupone/stores', [\App\Http\Controllers\Admin\HappyCoupon\StoreCouponController::class, 'index'])->name('happy_coupones.stores');
   });
+  Route::middleware(['permission:Управление КМ'])->group(function () {
+    Route::prefix('cat-in-bag')->name('cat-in-bag.')->group(function () {
+      Route::get('/prizes/active', [\App\Http\Controllers\Admin\CatInBag\PrizeController::class, 'activePrizes'])->name('prizes.active');
+    });
+  });
+  Route::middleware(['permission:Управление подарками КМ'])->group(function () {
+    Route::prefix('cat-in-bag')->name('cat-in-bag.')->group(function () {
+      Route::resource('/prizes', \App\Http\Controllers\Admin\CatInBag\PrizeController::class, ['except' => ['show', 'destroy']]);
+    });
+  });
+  Route::middleware(['permission:Управление категориями КМ'])->group(function () {
+    Route::prefix('cat-in-bag')->name('cat-in-bag.')->group(function () {
+      Route::resource('/categories', \App\Http\Controllers\Admin\CatInBag\CategoryController::class, ['except' => ['show', 'destroy']]);
+    });
+  });
 
   Route::middleware(['permission:Отгрузка заказов'])->group(function () {
     Route::get('/shipping/log', [\App\Http\Controllers\Admin\Shipping\ShippingLogController::class, 'index'])->name('shipping.log');

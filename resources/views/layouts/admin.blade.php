@@ -44,9 +44,9 @@
 
   <script>
     window.filemanger = {
-      video: @json(route('admin.unisharp.lfm.show')),
-      image: @json(route('admin.unisharp.lfm.show')),
-      file: @json(route('admin.unisharp.lfm.show')),
+      video: @json(route('admin.unisharp.lfm.show', [], false)),
+      image: @json(route('admin.unisharp.lfm.show', [], false)),
+      file: @json(route('admin.unisharp.lfm.show', [], false)),
     };
   </script>
   <!-- Scripts -->

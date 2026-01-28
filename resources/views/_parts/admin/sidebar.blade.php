@@ -140,38 +140,75 @@
           </div>
         </div>
       @endif
-      @if(auth()->user()->hasPermissionTo('Доступ к СК'))
-        <div class="w-full">
-          <div class="relative group dropdown">
-            <button class="nav-parent p-2 transition-colors rounded flex items-center w-full hover:bg-black/30">
-              <span class="mr-2 text-gray-300 text-left">
-                <i class="fa-solid fa-gifts w-5"></i>
-              </span>
-              <span class="text-xs">Счастливый купон</span>
-              <svg class="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M7 7l3 3 3-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
-              </svg>
-            </button>
-            <div class="dropdown-content hidden rounded-lg">
-              @if(auth()->user()->hasPermissionTo('Управление счастливым купоном'))
-                <a href="{{ route('admin.happy_coupones.activePrizes') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Активные подарки</a>
-              @endif
-              @if(auth()->user()->hasPermissionTo('Просмотр купонов "СК"'))
-                <a href="{{ route('admin.happy_coupones.index') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Купоны с подарками</a>
-              @endif
-              @if(auth()->user()->hasPermissionTo('Управление подарками'))
-                <a href="{{ route('admin.prizes.index') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">База подарков</a>
-              @endif
-              @if(auth()->user()->hasPermissionTo('Управление партнерами'))
-                <a href="{{ route('admin.partners.index') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Партнеры</a>
-              @endif
-              @if(auth()->user()->hasPermissionTo('Управление кодами магазинов для СК'))
-                <a href="{{ route('admin.happy_coupones.stores') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Купоны для магазинов</a>
-              @endif
-            </div>
+      <div class="w-full">
+        <div class="relative group dropdown">
+          <button class="nav-parent p-2 transition-colors rounded flex items-center w-full hover:bg-black/30">
+            <span class="mr-2 text-gray-300 text-left">
+              <i class="fa-solid fa-bullhorn w-5"></i>
+            </span>
+            <span class="text-xs">Промоакции</span>
+            <svg class="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <path d="M7 7l3 3 3-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+            </svg>
+          </button>
+          <div class="dropdown-content hidden rounded-lg">
+            @if(auth()->user()->hasPermissionTo('Доступ к СК'))
+              <div class="relative group dropdown">
+                <button class="nav-parent p-2 pl-6 transition-colors rounded flex items-center w-full hover:bg-black/30">
+                  <span class="mr-2 text-gray-300 text-left">
+                    <i class="fa-solid fa-gifts w-5"></i>
+                  </span>
+                  <span class="text-xs">Счастливый купон</span>
+                  <svg class="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M7 7l3 3 3-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+                  </svg>
+                </button>
+                <div class="dropdown-content hidden rounded-lg pl-6">
+                  @if(auth()->user()->hasPermissionTo('Управление счастливым купоном'))
+                    <a href="{{ route('admin.happy_coupones.activePrizes') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Активные подарки</a>
+                  @endif
+                  @if(auth()->user()->hasPermissionTo('Просмотр купонов "СК"'))
+                    <a href="{{ route('admin.happy_coupones.index') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Купоны с подарками</a>
+                  @endif
+                  @if(auth()->user()->hasPermissionTo('Управление подарками'))
+                    <a href="{{ route('admin.prizes.index') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">База подарков</a>
+                  @endif
+                  @if(auth()->user()->hasPermissionTo('Управление партнерами'))
+                    <a href="{{ route('admin.partners.index') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Партнеры</a>
+                  @endif
+                  @if(auth()->user()->hasPermissionTo('Управление кодами магазинов для СК'))
+                    <a href="{{ route('admin.happy_coupones.stores') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Купоны для магазинов</a>
+                  @endif
+                </div>
+              </div>
+            @endif
+            @if(auth()->user()->hasPermissionTo('Доступ к КМ'))
+              <div class="relative group dropdown">
+                <button class="nav-parent p-2 pl-6 transition-colors rounded flex items-center w-full hover:bg-black/30">
+                  <span class="mr-2 text-gray-300 text-left">
+                    <i class="fa-solid fa-cat w-5"></i>
+                  </span>
+                  <span class="text-xs">Кот в мешке</span>
+                  <svg class="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M7 7l3 3 3-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+                  </svg>
+                </button>
+                <div class="dropdown-content hidden rounded-lg pl-6">
+                  @if(auth()->user()->hasPermissionTo('Управление категориями КМ'))
+                    <a href="{{ route('admin.cat-in-bag.categories.index') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Категории</a>
+                  @endif
+                  @if(auth()->user()->hasPermissionTo('Управление КМ'))
+                    <a href="{{ route('admin.cat-in-bag.prizes.active') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">Активные подарки</a>
+                  @endif
+                  @if(auth()->user()->hasPermissionTo('Управление подарками КМ'))
+                    <a href="{{ route('admin.cat-in-bag.prizes.index') }}" class="w-auto nav-link no-underline p-2 transition-colors rounded flex items-center hover:bg-black/30 text-xs">База подарков</a>
+                  @endif
+                </div>
+              </div>
+            @endif
           </div>
         </div>
-      @endif
+      </div>
       @if(auth()->user()->hasPermissionTo('Просмотр пазлов для акции'))
         <div class="w-full">
           <div class="relative group dropdown">

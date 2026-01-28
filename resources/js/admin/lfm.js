@@ -68,6 +68,7 @@ window.choosedImages = (items) => {
     target_preview.innerHTML = "";
 
     items.forEach(function (item, index) {
+      const thumbUrl = item.thumb_url || item.url;
       const target_input_thumb = document.createElement('input')
       target_input_thumb.type = 'hidden'
       const target_input = document.createElement('input')
@@ -80,7 +81,7 @@ window.choosedImages = (items) => {
         target_input.name = `${input_name}[img]`
       }
       target_input.value = item.url
-      target_input_thumb.value = item.thumb_url
+      target_input_thumb.value = thumbUrl
 
       let full_image = document.createElement("a");
       full_image.href = 'javascript:;';
@@ -89,7 +90,7 @@ window.choosedImages = (items) => {
       full_image.setAttribute('data-src', item.url);
       let img = document.createElement("img");
       img.style.height = 'height: 5rem';
-      img.src = item.thumb_url;
+      img.src = thumbUrl;
       img.className = 'overflow-hidden max-w-full object-cover object-center'
       full_image.appendChild(img);
       target_preview.appendChild(full_image);

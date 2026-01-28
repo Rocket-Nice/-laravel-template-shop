@@ -42,7 +42,13 @@
                 <p class="text-[#B1908E] text-[20px] self-end line-through font-inter_font">2990 ₽</p>
             </div>
         </div>
-
+        <div class="flex justify-between mt-3">
+            <p class="text-xl font-[600] font_main-font">Сумма:</p>
+            <div class="flex gap-[12px] items-center font-inter_font">
+                <p class="text-[20px] leading-[28px]">0 ₽ </p>
+                <p class="text-[20px] line-through leading-[28px]">4 545 ₽ </p>
+            </div>
+        </div>
     </div>
 
 </div>

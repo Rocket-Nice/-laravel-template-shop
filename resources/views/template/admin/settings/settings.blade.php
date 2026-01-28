@@ -31,6 +31,10 @@
           </button>
           <button type="button"
                   class="whitespace-nowrap py-2 sm:py-4 px-1 border-b-2 font-medium text-sm focus:outline-none active:border-gray-500"
+                  id="tab-cat-in-bag" aria-selected="false" role="tab" aria-controls="tab-cat-in-bag-content">Режим «Кот в мешке»
+          </button>
+          <button type="button"
+                  class="whitespace-nowrap py-2 sm:py-4 px-1 border-b-2 font-medium text-sm focus:outline-none active:border-gray-500"
                   id="tab-4" aria-selected="false" role="tab" aria-controls="tab-4-content">Раздача пазлов
           </button>
           <button type="button"
@@ -142,6 +146,19 @@
           <div class="flex items-center">
             <input type="radio" id="happyCoupon-2" name="happyCoupon" value="0" class="form-control" @if(getSettings('happyCoupon') == 0) {{ 'checked' }}@endif>
             <label for="happyCoupon-2" class="ml-2">Акция выключена</label>
+          </div>
+        </div>
+      </div>
+      <div id="tab-cat-in-bag-content" role="tabpanel">
+        <div class="form-group">
+          <x-input-label :value="__('Режим «Кот в мешке»')" />
+          <div class="flex items-center">
+            <input type="radio" id="catInBag-1" name="catInBag" value="1" class="form-control" @if(getSettings('catInBag') == 1) {{ 'checked' }}@endif>
+            <label for="catInBag-1" class="ml-2">Акция включена</label>
+          </div>
+          <div class="flex items-center">
+            <input type="radio" id="catInBag-2" name="catInBag" value="0" class="form-control" @if(getSettings('catInBag') == 0) {{ 'checked' }}@endif>
+            <label for="catInBag-2" class="ml-2">Акция выключена</label>
           </div>
         </div>
       </div>

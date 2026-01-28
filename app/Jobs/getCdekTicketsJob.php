@@ -24,8 +24,8 @@ class getCdekTicketsJob implements ShouldQueue
      */
     public function __construct($order_ids = [], $user_id)
     {
-      $this->order_ids = $order_ids;
-      $this->user_id = $user_id;
+        $this->order_ids = $order_ids;
+        $this->user_id = $user_id;
     }
     /**
      * Execute the job.
@@ -34,7 +34,10 @@ class getCdekTicketsJob implements ShouldQueue
      */
     public function handle()
     {
-      (New CdekController())->getTickets($this->order_ids ?? null, $this->user_id);
-      return true;
+        $response = (new CdekController())->getTickets($this->order_ids ?? null, $this->user_id);
+
+        logger()->info(json_encode(['getTickets_response' => $response]));
+
+        return true;
     }
 }
