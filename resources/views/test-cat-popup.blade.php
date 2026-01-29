@@ -6,12 +6,6 @@
             <div class="bg-white rounded-lg shadow-md p-6 mb-8 flex items-center justify-center flex-col">
                 <h1 class="text-3xl font-bold text-gray-900 mb-8">Тестирование компонента &lt;x-cat-popup&gt;</h1>
 
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Тот, что открывается попапом при клике в баннере
-                </h2>
-                <x-cat-popup />
-
-                <br><br>
-
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Тот, что в блоке "спасибо"</h2>
                 <x-cat-bag-in-th-order />
 
@@ -34,6 +28,13 @@
                 </button>
 
                 <x-popup-own />
+
+                <br><br>
+
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Попап, что открывается попапом при клике на кошку
+                    справа снизу
+                </h2>
+                <x-cat-popup />
 
             </div>
         </div>
