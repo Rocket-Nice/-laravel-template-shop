@@ -8,6 +8,7 @@
         document.body.classList.remove('overflow-hidden')
     },
     handleScroll(e) {
+        // Если скролл находится не в самом верху, переключаем на полный экран
         if (e.target.scrollTop > 10 && !this.isFullscreen) {
             this.isFullscreen = true;
         }

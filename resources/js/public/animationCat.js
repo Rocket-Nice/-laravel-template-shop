@@ -1,4 +1,3 @@
-// Импортируем GSAP и плагины
 import gsap from 'gsap';
 import { Flip } from 'gsap/Flip';
 
@@ -12,6 +11,7 @@ const subtitle = document.querySelector(".subtitle");
 const infoText = document.querySelector(".info-text");
 const prizeContainer = document.querySelector(".sack-price-container");
 const prizeCards = document.querySelector(".sack-price-cards");
+const sackCatWrapper = document.querySelector(".sack-cat-wrapper");
 
 const openedCards = new Set();
 
@@ -22,16 +22,23 @@ if (sackCards.length === 4) {
   sacksContainer.classList.add("has-four-cards");
 }
 
-// тут меняю на серые мешки, если нужна плавность, то всё через css и тут заменить логику по применению стилей на add() remove()
+function isMobileDevice() {
+  return window.innerWidth <= 600;
+}
+
+function preloadPrizeImage(imageUrl) {
+  const img = new Image();
+  img.src = imageUrl;
+}
+
 function changeSacksImages() {
   sackCards.forEach((card) => {
     const img = card.querySelector("img");
-    img.src = "/img/cat-bag/animation-sack/sack.png";
+    img.src = "/img/cat-bag/animation-sack/sack.svg";
     img.alt = "sack";
   });
 }
 
-// порядок анимации, настроил его (не трогать)
 const SHUFFLE_SEQUENCES = {
   3: [
     [1, 2, 0],
@@ -42,7 +49,6 @@ const SHUFFLE_SEQUENCES = {
     [0, 1, 2],
   ],
   4: [
-    // 4 мешка
     [2, 0, 3, 1],
     [1, 2, 3, 0],
     [2, 3, 1, 0],
@@ -51,40 +57,138 @@ const SHUFFLE_SEQUENCES = {
   ],
 };
 
-function shuffleRound(orderPattern) {
-  return new Promise((resolve) => {
+function getTriangleCenter(cards) {
+  const rects = cards.map(c => c.getBoundingClientRect());
+
+  const centerX =
+    (rects[0].left + rects[1].right) / 2;
+
+  const centerY =
+    (rects[0].top + rects[2].bottom) / 2;
+
+  return { x: centerX, y: centerY };
+}
+
+async function shuffleRound(orderPattern, isCenterPosition = false) {
+  if (!isCenterPosition) {
+    return new Promise(resolve => {
+      const state = Flip.getState(sackCards);
+
+      sackCards.forEach((card, i) => {
+        card.style.order = orderPattern[i];
+      });
+
+      Flip.from(state, {
+        duration: 0.6,
+        ease: "power2.inOut",
+        scale: true,
+        onComplete: resolve
+      });
+    });
+  }
+
+  const center = getTriangleCenter(sackCards);
+
+  const offsets = sackCards.map(card => {
+    const r = card.getBoundingClientRect();
+    return {
+      x: center.x - (r.left + r.width / 2),
+      y: center.y - (r.top + r.height / 2)
+    };
+  });
+
+  await gsap.to(sackCards, {
+    x: i => offsets[i].x,
+    y: i => offsets[i].y,
+    duration: 0.4,
+    ease: "power2.inOut"
+  });
+
+  await new Promise(r => setTimeout(r, 600));
+  await gsap.to(sackCards, {
+    x: 0,
+    y: 0,
+    duration: 0.4,
+    ease: "power2.inOut"
+  });
+
+  return new Promise(resolve => {
     const state = Flip.getState(sackCards);
 
-    sackCards.forEach((card, index) => {
-      card.style.order = orderPattern[index];
+    sackCards.forEach((card, i) => {
+      card.style.order = orderPattern[i];
     });
 
     Flip.from(state, {
       duration: 0.6,
       ease: "power2.inOut",
       scale: true,
-      onComplete: resolve,
+      onComplete: resolve
     });
   });
 }
 
-// тут создаём карточку приза
 function createPrizeCard(imageUrl, productText) {
   const prizeCard = document.createElement("div");
   prizeCard.className = "prize-card";
 
-  //  Макс, вот тут можно заменить на нужные тебе данные
+  const truncatedText = truncateText(productText, 2);
+
   prizeCard.innerHTML = `
     <img src="${imageUrl}" alt="prize">
-    <p class="prize-text">${productText}</p>
+    <p class="prize-text" title="${productText}">${truncatedText}</p>
   `;
 
   return prizeCard;
 }
 
+function truncateText(text, maxLines) {
+  const words = text.split(' ');
+  let result = '';
+  let lineCount = 0;
+
+  for (let word of words) {
+    const testText = result + (result ? ' ' : '') + word;
+    const tempElement = document.createElement('div');
+    tempElement.style.cssText = `
+      position: absolute;
+      visibility: hidden;
+      font-size: 14px;
+      line-height: 1.4;
+      width: 100%;
+      max-width: 366px;
+      word-wrap: break-word;
+    `;
+    tempElement.textContent = testText;
+    document.body.appendChild(tempElement);
+
+    const height = tempElement.offsetHeight;
+    const lineHeight = 14 * 1.4;
+    const currentLines = Math.ceil(height / lineHeight);
+
+    document.body.removeChild(tempElement);
+
+    if (currentLines <= maxLines) {
+      result = testText;
+    } else {
+      if (lineCount < maxLines) {
+        result = testText;
+        lineCount++;
+      } else {
+        break;
+      }
+    }
+  }
+
+  return result + (result.length < text.length ? '...' : '');
+}
+
 function openSack(event) {
   const card = event.currentTarget;
   const img = card.querySelector("img");
+
+  const prizeImageUrl = "/img/cat-bag/animation-sack/product.png";
+  preloadPrizeImage(prizeImageUrl);
 
   openedCards.add(card);
 
@@ -99,31 +203,73 @@ function openSack(event) {
     }
   });
 
+  if (isMobileDevice()) {
+    sackCatWrapper.style.width = "auto";
+  }
+
   card.classList.add("expanded-card");
-  // вот тут смотри по маршрутам гифки, если что сам переделаешь
   img.src = "/img/cat-bag/animation/animation.gif";
 
+  const hiddenPrizeImg = document.createElement('img');
+  hiddenPrizeImg.src = prizeImageUrl;
+  hiddenPrizeImg.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: -1;
+    object-fit: contain;
+  `;
+  card.appendChild(hiddenPrizeImg);
+
   setTimeout(() => {
-    card.classList.remove("expanded-card");
-    card.classList.add("product-card");
+    gsap.to(img, {
+      opacity: 0,
+      duration: 0.3,
+      onComplete: () => {
+        img.src = prizeImageUrl;
+        img.style.opacity = 0;
 
-    // тут также
-    img.src = "/img/cat-bag/animation-sack/product.png";
+        gsap.to(img, {
+          opacity: 1,
+          duration: 0.5,
+          ease: "power2.inOut"
+        });
 
-    // вот тут если нужно тяни данные с бэка
-    card.dataset.productImage = "/img/cat-bag/animation-sack/product.png";
-    // вот тут если нужно тяни данные с бэка
+        if (hiddenPrizeImg.parentNode) {
+          hiddenPrizeImg.remove();
+        }
 
-    subtitle.textContent = "Ваша удача в акции";
+        card.classList.remove("expanded-card");
+        card.classList.add("product-card");
 
-    startBtn.textContent = "Далее";
-    startBtn.classList.remove("hidden");
-    startBtn.disabled = false;
+        card.dataset.productImage = prizeImageUrl;
 
-    isNextMode = true;
-    currentOpenedCard = card;
-    // вот тут задержка на время проигрывания гифки
-  }, 4000);
+        const productTextElement = card.querySelector(".sack-product-text");
+        if (productTextElement) {
+          const originalText = productTextElement.textContent;
+          const truncatedText = truncateText(originalText, 2);
+          productTextElement.textContent = truncatedText;
+          productTextElement.title = originalText;
+        }
+
+        if (isMobileDevice()) {
+          sackCatWrapper.style.width = "100%";
+        }
+
+        subtitle.textContent = "Ваша удача в акции";
+
+        startBtn.textContent = "Далее";
+        startBtn.classList.remove("hidden");
+        startBtn.disabled = false;
+
+        isNextMode = true;
+        currentOpenedCard = card;
+      }
+    });
+  }, 3800);
 }
 
 function returnToSelection(openedCard) {
@@ -149,25 +295,20 @@ function returnToSelection(openedCard) {
   openedCard.classList.remove("product-card");
 
   const img = openedCard.querySelector("img");
-  img.src = "/img/cat-bag/animation-sack/sack.png";
+  img.src = "/img/cat-bag/animation-sack/sack.svg";
 
   const productText = openedCard.querySelector(".sack-product-text");
   if (productText) {
     productText.style.display = "none";
   }
-  // тут тоже смотри
-  const imageUrl = img.src;
-  const text = productText ? productText.textContent : "Подарок";
 
-  // тут тоже смотри
-  const productImageUrl =
-    openedCard.dataset.productImage ||
-    "/img/cat-bag/animation-sack/product.png";
+  const imageUrl = img.src;
+  const text = productText ? productText.title || productText.textContent : "Подарок";
+  const productImageUrl = openedCard.dataset.productImage || "/img/cat-bag/animation-sack/product.png";
 
   const prizeCard = createPrizeCard(productImageUrl, text);
   prizeCards.appendChild(prizeCard);
 
-  // тут показ контейнера
   prizeContainer.classList.add("visible");
 }
 
@@ -183,8 +324,12 @@ async function shuffleSacks() {
   const sequence = SHUFFLE_SEQUENCES[sackCards.length];
 
   for (let i = 0; i < sequence.length; i++) {
-    await shuffleRound(sequence[i]);
+    const isCenterPosition = (sackCards.length === 3 && i === 3) ||
+      (sackCards.length === 4 && i === 3);
+
+    await shuffleRound(sequence[i], isCenterPosition);
   }
+
   await new Promise((resolve) => setTimeout(resolve, 200));
 
   sacksContainer.classList.remove("animating");
@@ -204,5 +349,15 @@ startBtn.addEventListener("click", () => {
     returnToSelection(currentOpenedCard);
   } else {
     shuffleSacks();
+  }
+});
+
+sackCards.forEach(card => {
+  const productText = card.querySelector(".sack-product-text");
+  if (productText) {
+    const originalText = productText.textContent;
+    const truncatedText = truncateText(originalText, 2);
+    productText.textContent = truncatedText;
+    productText.title = originalText;
   }
 });

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Order;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class CheckWrongBonusUse extends Command
@@ -32,7 +33,7 @@ class CheckWrongBonusUse extends Command
 
         $handle = fopen($filePath, 'w');
 
-        fputcsv($handle, ['order_id', 'amount', 'cart_sum']);
+        fputcsv($handle, ['бренд', 'дата', 'бонусов списано', 'сумма заказов']);
 
         Order::orderBy('id')
             ->chunk(500, function ($orders) use ($handle) {
@@ -41,6 +42,10 @@ class CheckWrongBonusUse extends Command
                     $cart = $order->data_cart;
 
                     if (!is_array($cart)) {
+                        continue;
+                    }
+
+                    if (!isset($order->data['bonuses'])) {
                         continue;
                     }
 
@@ -60,8 +65,9 @@ class CheckWrongBonusUse extends Command
                     // Amount is paid sum
                     if ($order->amount < ($cartSum * 0.5)) {
                         fputcsv($handle, [
-                            $order->id,
-                            $order->amount,
+                            'Lemousse',
+                            Carbon::parse($order->created_at)->format('d/m/Y H:i:s'),
+                            $cartSum - $order->amount,
                             $cartSum
                         ]);
                     }

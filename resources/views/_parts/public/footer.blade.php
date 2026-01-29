@@ -95,6 +95,7 @@
         @if(getSettings('goldTicket'))
           <a href="{{ route('page', 'aktsiya_zolotoy_bilet') }}">Правила проведения рекламной акции «Золотой билет»</a>
         @endif
+        <a onclick="window.dispatchEvent(new CustomEvent('open-popup-own'))" class="transition">Информация об интеллектуальной собственности</a>
       </nav>
       <div class="mt-6 flex flex-col lg:flex-row lg:space-x-12">
         <div>
@@ -115,6 +116,7 @@
     <div class="mb-8" id="custom-alert__title"></div>
   </div>
 </x-public.popup>
+<x-popup-own />
 <div id="goldticket-alert" class="relative border-none !px-3 !py-3 sm:!px-5 sm:!py-5 w-full !max-w-[340px] sm:!max-w-[547px] !rounded-4xl" style="display: none;background: #F2E2DA">
   <div class="flex items-center sm:items-start justify-between flex-col-reverse sm:flex-row">
     <div class="w-7"></div>

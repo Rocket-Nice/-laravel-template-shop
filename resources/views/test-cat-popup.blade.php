@@ -27,11 +27,6 @@
 
                 <br><br>
 
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Акция с анимацией</h2>
-                <x-cat-bags />
-
-                <br><br>
-
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">попап собственность</h2>
                 <button onclick="window.dispatchEvent(new CustomEvent('open-popup-own'))"
                     class="px-6 py-3 rounded-lg bg-gray-900 text-white font-medium hover:bg-gray-800 transition">
@@ -43,4 +38,9 @@
             </div>
         </div>
     </div>
+
+    <br><br>
+
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Акция с анимацией</h2>
+    <x-cat-bags />
 </x-app-layout>

@@ -1256,8 +1256,6 @@ p>img {
   cursor: pointer;
 }
 
-/* враппер для контейнера с подараками и выигрышем */
-
 .sack-cat-wrapper {
   display: flex;
   flex-direction: column;
@@ -1266,42 +1264,19 @@ p>img {
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  padding: 0 16px;
+  height: auto;
 }
 
 .sack-cat-wrapper::-webkit-scrollbar {
   display: none;
 }
 
-/* контейнер кота */
 .sack-cat-container {
   display: flex;
   flex-direction: column;
   gap: 32px;
   max-width: 480px;
-}
-
-/* контейнер с подарками */
-
-.sack-price-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 480px;
-}
-
-.sack-price-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-.prize-title {
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 32px;
-  text-transform: uppercase;
-  color: #000;
-  text-align: center;
 }
 
 .title-container {
@@ -1332,7 +1307,6 @@ p>img {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  max-height: 480px;
 }
 
 .sacks-animation-container:has(.expanded-card),
@@ -1340,21 +1314,115 @@ p>img {
   grid-template-columns: 1fr;
 }
 
+.sacks-animation-container.has-four-cards .sack-card:last-child:nth-child(4) {
+  grid-column: auto;
+  justify-self: auto;
+  width: 100%;
+}
+
+.sacks-animation-container.animating {
+  pointer-events: none;
+}
+
+.sacks-animation-container.animating .sack-card {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .sack-card {
   width: 100%;
   max-height: 236px;
+  transition: opacity 0.3s ease;
+  aspect-ratio: 1 / 1;
+  position: relative;
 }
 
 .sack-card:last-child:nth-child(3) {
   grid-column: 1 / 3;
   justify-self: center;
-  width: calc(50% - 4px);
+}
+
+.sack-card.opened-sack {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+}
+
+.sack-card.expanded-card {
+  grid-column: 1 / -1;
+  width: 100% !important;
+  max-height: none;
+  justify-self: center;
+  min-height: 438px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sack-card.product-card {
+  width: 100%;
+  max-height: none;
+  position: relative;
+  background-color: #eaeaea;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  aspect-ratio: auto;
+  padding: 24px 12px;
+  justify-content: center;
 }
 
 .sack-card img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  aspect-ratio: 1 / 1;
+  background-color: transparent;
+  transition: opacity 0.5s ease;
+}
+
+.sack-card.product-card img {
+  align-self: center;
+  max-width: 366px;
+  max-height: 366px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  animation: fadeInProduct 0.5s ease-out forwards;
+}
+
+.sack-card .hidden-prize-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: -1;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.sack-product-text {
+  display: none;
+}
+
+.sack-card.product-card .sack-product-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  max-width: 366px;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 400;
+  color: #414141;
+  max-height: 2.8em;
+  word-break: break-word;
+  hyphens: auto;
+  min-height: 2.8em;
+  width: 100%;
+  padding: 0 12px;
+  margin-top: 8px;
 }
 
 .btn-info-container {
@@ -1387,12 +1455,6 @@ p>img {
   width: 100%;
 }
 
-.sacks-animation-container.has-four-cards .sack-card:last-child:nth-child(4) {
-  grid-column: auto;
-  justify-self: auto;
-  width: 100%;
-}
-
 .start-btn.hidden {
   display: none;
 }
@@ -1400,24 +1462,28 @@ p>img {
 .sack-price-container {
   display: none;
   max-width: 480px;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .sack-price-container.visible {
   display: flex;
-  gap: 16px;
-}
-
-.prize-title {
-  font-size: 24px;
-  font-weight: 700;
-  text-align: center;
-  color: #000;
 }
 
 .sack-price-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
+  min-height: 236px;
+}
+
+.prize-title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 32px;
+  text-transform: uppercase;
+  color: #000;
+  text-align: center;
 }
 
 .prize-card {
@@ -1431,8 +1497,11 @@ p>img {
 
 .prize-card img {
   width: 100%;
+  height: 100%;
   max-height: 220px;
   object-fit: contain;
+  aspect-ratio: 1 / 1;
+  background-color: transparent;
 }
 
 .prize-text {
@@ -1440,93 +1509,200 @@ p>img {
   text-align: center;
   color: #414141;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.4;
-}
-
-.sack-card.expanded-card {
-  grid-column: 1 / -1;
-  width: 100% !important;
-  max-height: none;
-  justify-self: center;
-  min-height: 438px;
-}
-
-.sack-card.opened-sack {
-  opacity: 0.5;
-  cursor: not-allowed !important;
-}
-
-.sack-card.product-card {
-  /* grid-column: 1 / -1; */
-  width: 100%;
-  max-height: none;
-  /* justify-self: center; */
-  position: relative;
-  background-color: #eaeaea;
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.sack-product-text {
-  display: none;
-}
-
-.sack-card.product-card .sack-product-text {
-  display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: center;
-  max-width: 366px;
-  font-size: 14px;
-  line-height: 16px;
-  font-weight: 400;
+  line-height: 1.4;
+  max-height: 2.8em;
+  word-break: break-word;
+  hyphens: auto;
+  min-height: 2.8em;
+  padding: 0 4px;
 }
 
-.product-card {
-  min-width: 480px;
-  min-height: 438px;
-  padding: 12px;
+.text-two-lines {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+  hyphens: auto;
 }
 
-.sack-card.product-card img {
-  align-self: center;
-  max-width: 366px;
-  max-height: 366px;
+.preload-image {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes fadeInProduct {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.sack-card.loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.sacks-animation-container,
+.sack-card,
+.sack-card img {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+@supports (-moz-appearance: none) {
+
+  .sack-product-text,
+  .prize-text {
+    display: block;
+    max-height: 2.8em;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .sack-product-text::after,
+  .prize-text::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 1em;
+    height: 1.4em;
+    background: linear-gradient(to right, transparent, currentColor 50%);
+  }
 }
 
 @media (max-width: 1024px) {
   .btn-info-container {
     max-width: 100%;
   }
+
+  .product-card {
+    min-width: 400px;
+    min-height: 400px;
+  }
+
+  .sack-card.product-card img {
+    max-width: 320px;
+    max-height: 320px;
+  }
 }
 
 @media (max-width: 600px) {
-  .sack-cat-wrapper {
-    padding: 0 16px;
-    height: calc(100dvh - 100px);
-  }
-
   .product-card {
     margin: 0 auto;
     min-width: 332px;
     min-height: 332px;
     max-width: 332px;
     max-height: 332px;
-    padding: 12px;
+    padding: 16px 12px;
   }
 
   .sack-card.product-card img {
-    align-self: center;
     max-width: 250px;
     max-height: 250px;
+  }
+
+  .sack-card.product-card .sack-product-text {
+    max-width: 280px;
+    font-size: 13px;
+    line-height: 1.3;
+    min-height: 2.6em;
+  }
+
+  .prize-text {
+    font-size: 12px;
+    line-height: 1.3;
+    min-height: 2.6em;
+  }
+
+  .sacks-animation-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .sack-card {
+    max-height: 180px;
+  }
+
+  .sack-card:last-child:nth-child(3) {
+    width: calc(50% - 3px);
+  }
+
+  .sack-price-cards {
+    gap: 6px;
+  }
+
+  .prize-card {
+    padding: 8px;
+  }
+
+  .prize-card img {
+    max-height: 180px;
+  }
+
+  .sack-card.product-card {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 24px;
+    line-height: 28px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .prize-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 375px) {
+  .product-card {
+    min-width: 280px;
+    min-height: 280px;
+    max-width: 280px;
+    max-height: 280px;
+  }
+
+  .sack-card.product-card img {
+    max-width: 200px;
+    max-height: 200px;
+  }
+
+  .sack-card.product-card .sack-product-text {
+    max-width: 240px;
+    font-size: 12px;
   }
 }
 

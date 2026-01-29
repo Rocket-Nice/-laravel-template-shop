@@ -27,10 +27,10 @@
                     <p class="sack-product-text">Очень длинное название для этого продукта будет находиться в этом</p>
                 </div>
                 <!-- 4 мешок, по коду 2 варианта перемешивания -->
-                {{-- <div class="sack-card">
+                <div class="sack-card">
                     <img src="/img/cat-bag/animation-sack/pre-sack4.png" alt="pre">
                     <p class="sack-product-text">Очень длинное название для этого продукта будет находиться в этом</p>
-                </div> --}}
+                </div>
             </div>
         </div>
         <div class="sack-price-container">
