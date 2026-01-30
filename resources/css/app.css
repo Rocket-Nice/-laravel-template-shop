@@ -1575,28 +1575,6 @@ p>img {
   -webkit-backface-visibility: hidden;
 }
 
-@supports (-moz-appearance: none) {
-
-  .sack-product-text,
-  .prize-text {
-    display: block;
-    max-height: 2.8em;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .sack-product-text::after,
-  .prize-text::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 1em;
-    height: 1.4em;
-    background: linear-gradient(to right, transparent, currentColor 50%);
-  }
-}
-
 @media (max-width: 1024px) {
   .btn-info-container {
     max-width: 100%;
