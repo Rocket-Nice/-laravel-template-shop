@@ -34,134 +34,23 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // Remove bonus without expiration date
+        $schedule->command('remove:bonus-without-expiration-date')->dailyAt('00:00')
+            ->when(function () {
+                return now()->between(
+                    '2026-02-01 00:00:00',
+                    '2026-02-01 00:02:00'
+                );
+            })
+            ->withoutOverlapping()
+            ->onOneServer();
+
         $schedule->call(function () {
             if (ExportFile::query()->where('size', null)->exists()) {
                 CalcExportFilesJob::dispatch()->onQueue('calc_export_files');
             }
         })->everyMinute();
-        //Log::debug('hello');
 
-        // $schedule->command('queue:work --queue=telegram_queue')->at('16:41');
-        //      $schedule->call(function(){
-        //       Log::debug(1222);
-        //      })->everyMinute();
-
-        //      $schedule->call(function(){
-        //        $prize_id = 128;
-        //        $prize = Prize::find($prize_id);
-        //        $gave = $prize->giftCoupons()->where('created_at', '>', '2024-02-25 10:00:00')->count();
-        //        if ($gave < 2 && $prize->count == 0) {
-        //          $this->addPrize($prize_id, 1);
-        //        }
-        //      })->at('03:00');
-        // iphone
-        //       $schedule->call(function(){
-        //        $prize_id = 167;
-        //        $prize = Prize::find($prize_id);
-        //        $gave = $prize->giftCoupons()->where('created_at', '>', '2024-06-01 07:00:00')->count();
-        //        if ($gave < 3 && $prize->count == 0) {
-        //          $this->addPrize($prize_id, 1);
-        //        }
-        //      })
-        //          ->when(function(){
-        //            $times17 = [
-        //                '15:30',
-        //                '16:30',
-        //            ];
-        //            $now = now()->toTimeString('minutes');
-        //            return (in_array($now, $times17) && (now()->day == 1));
-        //          })
-        //          ->everyMinute();
-        // Бокс с мини версиями
-        //       $schedule->call(function(){
-        //        $prize_id = 147;
-        //        $prize = Prize::find($prize_id);
-        //        $gave = $prize->giftCoupons()->where('created_at', '>', '2024-02-25 10:00:00')->count();
-        //        if ($gave < 10 && $prize->count == 0) {
-        //          $this->addPrize($prize_id, 1);
-        //        }
-        //      })
-        //          ->when(function(){
-        //            $times17 = [
-        //                '00:10',
-        //                '02:30',
-        //                '04:50',
-        //                '07:20',
-        //                '09:30',
-        //                '11:10',
-        //                '13:40',
-        //                '15:25',
-        //                '17:55',
-        //            ];
-        //            $now = now()->toTimeString('minutes');
-        //            return (in_array($now, $times17) && (now()->day == 26));
-        //          })
-        //          ->everyMinute();
-        // фен
-        //       $schedule->call(function(){
-        //        $prize_id = 130;
-        //        $prize = Prize::find($prize_id);
-        //        $gave = $prize->giftCoupons()->where('created_at', '>', '2024-02-25 10:00:00')->count();
-        //        if ($gave < 18 && $prize->count == 0) {
-        //          $this->addPrize($prize_id, 1);
-        //        }
-        //      })
-        //          ->when(function(){
-        //            $times17 = [
-        //                '10:10',
-        //                '10:20',
-        //                '10:30',
-        //                '10:40',
-        //                '10:50',
-        //                '11:00',
-        //                '11:10',
-        //                '11:20',
-        //                '11:30',
-        //                '11:45',
-        //                '12:00',
-        //                '12:15',
-        //                '12:30',
-        //                '12:45',
-        //                '13:00',
-        //                '13:15',
-        //                '13:30',
-        //                '13:45',
-        //                '14:00',
-        //            ];
-        //            $now = now()->toTimeString('minutes');
-        //            return (in_array($now, $times17) && (now()->day == 25));
-        //          })
-        //          ->everyMinute();
-        // рассылка
-        //      $schedule->call(function(){
-        //        $users = User::query()->whereHas('tgChats', function(Builder $builder){
-        //          $builder->where('active', true);
-        //        })
-        //            ->whereDoesntHave('orders', function (Builder $builder){
-        //              $builder->where('confirm', 1);
-        //              $builder->where('created_at', '>', '2024-06-01 00:00:00');
-        //            })
-        ////            ->whereIn('id', [1,2])
-        //            ->pluck('id')->toArray();
-        //        $mailing = MailingList::find(14);
-        //        $text = "*ХОЧЕШЬ В ДУБАЙ\\?*\n\n";
-        //
-        //        $text .= "Только *24ч*🔥\nНаш клиентский день в LE MOUSSE\n*1 \\+ 1 \\= 3🎁 1000 подарков *✈️\n\n";
-        //
-        //        $text .= "https://lemousse\\.shop\n\n";
-        //
-        //        $text .= "Самый дорогой продукт в корзине в подарок, а так же возможность выиграть *Путевку в Дубай*, Apple IPhone, SPA боксы и еще *1000 крутых призов*\\!\n\n";
-        //
-        //        $text .= "_Акция распространяется на товары из одной категории💫_";
-        //        $tgChats = TgChat::query()->with('user')->whereIn('user_id', $users)->where('active', true)->chunk(1, function ($tgChats) use ($text, $mailing) {
-        //          foreach($tgChats as $tgChat){
-        //            $tgChat->user->mailing_list()->syncWithoutDetaching($mailing);
-        //            $tgChat->notify(new TelegramNotification($text, 'text_message', 'MarkdownV2'));
-        //          }
-        //        });
-        //      })->at('11:00');
-
-        // Log::debug('try schedule');
         if (config('app.env') === 'production') {
             $schedule->call(function () {
                 checkCdekCourierCitiesJob::dispatch(1)->onQueue('check_cities');

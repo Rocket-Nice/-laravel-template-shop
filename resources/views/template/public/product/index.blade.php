@@ -735,8 +735,7 @@
               <div class="py-4 md:py-6">
                 @if(trim(mb_strtolower($accortion_item['title'])) == mb_strtolower('СПОСОБ ПРИМЕНЕНИЯ') && ($product->style_page['k_info'] ?? false))
                   <div class="text-white font-bold p-1 mb-4 text-center" style="background: rgba(0,0,0,.36);">
-                    Более подробно о комплексном уходе<br/>
-                    и сочетании продуктов читайте выше.
+                    Подробнее о комплексном уходе<br> и сочетании продуктов читайте выше.
                   </div>
                 @endif
                 {!! $accortion_item['text'] !!}
