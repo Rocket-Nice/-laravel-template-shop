@@ -1,3 +1,28 @@
+@props([
+    'bagCount' => 3,
+    'categoryIds' => [],
+    'orderId' => null,
+    'orderSlug' => null,
+    'openLimit' => null,
+])
+@php($hasGoldenBag = ((int)$bagCount) === 4)
+@php($categories = !empty($categoryIds)
+    ? \App\Models\CatInBagCategory::query()->whereIn('id', $categoryIds)->get()->keyBy('id')
+    : collect())
+@php($categoryImages = collect($categoryIds)->map(function ($id) use ($categories) {
+    $category = $categories->get($id);
+    if (!$category) {
+        return null;
+    }
+    return $category->data['image']['thumb'] ?? $category->data['image']['img'] ?? $category->image;
+})->filter()->values()->all())
+@php($routeOrder = request()->route('order'))
+@php($routeOrderId = $routeOrder instanceof \App\Models\Order ? $routeOrder->id : (is_numeric($routeOrder) ? $routeOrder : null))
+@php($routeOrderSlug = $routeOrder instanceof \App\Models\Order ? $routeOrder->slug : (is_string($routeOrder) ? $routeOrder : null))
+@php($orderIdValue = $orderId ? (string)$orderId : (string)($routeOrderId ?: request()->get('InvId', '')))
+@php($orderSlugValue = $orderSlug ? (string)$orderSlug : (string)($routeOrderSlug ?: ''))
+@php($openLimitValue = $openLimit !== null ? (string)$openLimit : '')
+
 <div x-data="{
     open: false,
     lock() {
@@ -32,7 +57,11 @@ window.addEventListener('keydown', e => {
     </button>
     <div class="relative w-full max-w-[480px] flex flex-col bg-white">
         <div class="pb-6 font-[400] overflow-y-auto no-scrollbar">
-            <div class="cat-container">
+            <div class="cat-container"
+                 data-category-images='@json($categoryImages)'
+                 data-order-id="{{ $orderIdValue }}"
+                 data-order-slug="{{ $orderSlugValue }}"
+                 data-open-limit="{{ $openLimitValue }}">
                 <div class="sack-cat-wrapper">
                     <div class="sack-cat-container">
                         <div class="title-container">
@@ -40,7 +69,7 @@ window.addEventListener('keydown', e => {
                             <p class="subtitle font-inter_font">Запустите игру и испытайте удачу!</p>
                         </div>
 
-                        <div class="sacks-animation-container font-inter_font">
+                        <div class="sacks-animation-container font-inter_font {{ $hasGoldenBag ? 'has-four-cards' : '' }}">
                             <div class="sack-card">
                                 <img src="/img/cat-bag/animation-sack/pre-sack1.png" alt="pre">
                                 <p class="sack-product-text">Очень длинное название для этого продукта будет находиться
@@ -57,11 +86,13 @@ window.addEventListener('keydown', e => {
                                     в этом</p>
                             </div>
                             <!-- 4 мешок, по коду 2 варианта перемешивания -->
-                            <div class="sack-card">
-                                <img src="/img/cat-bag/animation-sack/pre-sack4.png" alt="pre">
-                                <p class="sack-product-text">Очень длинное название для этого продукта будет находиться
-                                    в этом</p>
-                            </div>
+                            @if($hasGoldenBag)
+                                <div class="sack-card">
+                                    <img src="/img/cat-bag/animation-sack/pre-sack4.png" alt="pre">
+                                    <p class="sack-product-text">Очень длинное название для этого продукта будет находиться
+                                        в этом</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <div class="sack-price-container">
@@ -77,6 +108,11 @@ window.addEventListener('keydown', e => {
 
                     <x-cat-bag-button class="start-btn">
                         Перемешать
+                    </x-cat-bag-button>
+
+                    <x-cat-bag-button variant="outline" class="cabinet-btn hidden mt-2" type="button"
+                        onclick="window.location.href='/cabinet/orders'">
+                        В личный кабинет
                     </x-cat-bag-button>
                 </div>
             </div>

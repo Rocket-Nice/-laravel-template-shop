@@ -25,6 +25,13 @@
                   id="tab-3" aria-selected="true" role="tab" aria-controls="tab-3-content">Подарки
           </button>
         @endif
+        @if($catInBagSession && $catInBagSession->bags->count() > 0)
+          <button type="button"
+                  class="whitespace-nowrap py-2 sm:py-4 px-1 border-b-2 font-medium text-sm focus:outline-none active:border-gray-500"
+                  id="tab-cat-in-bag" aria-selected="true" role="tab"
+                  aria-controls="tab-cat-in-bag-content">Подарок Кот в мешке
+          </button>
+        @endif
         @if(auth()->id()==1)
           <button type="button"
                   class="whitespace-nowrap py-2 sm:py-4 px-1 border-b-2 font-medium text-sm focus:outline-none active:border-gray-500"
@@ -245,6 +252,44 @@
             </table>
           </div>
         </div>
+        @if($catInBagSession && $catInBagSession->bags->whereNotNull('opened_at')->count())
+          @php
+            $openedCatBags = $catInBagSession->bags->whereNotNull('opened_at')->values();
+          @endphp
+          <div class="mx-auto py-4">
+            <p class="mb-2"><strong>Подарки «Кот в мешке»:</strong></p>
+            <div class="relative overflow-x-auto">
+              <table class="table-auto w-full text-center border-collapse border border-gray-200 rounded-md text-sm">
+                <thead>
+                <tr>
+                  <th class="bg-gray-100 border p-2 text-left">Наименование</th>
+                  <th class="bg-gray-100 border p-2">Артикул</th>
+                  <th class="bg-gray-100 border p-2">Количество</th>
+                  <th class="bg-gray-100 border p-2">Цена</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($openedCatBags as $bag)
+                  @php
+                    $giftProduct = $bag->product ?? $bag->prize?->product;
+                    $giftName = $bag->prize?->name ?? $giftProduct?->name ?? 'Подарок';
+                    $giftPrice = 0;
+                    if ($bag->prize_type === 'certificate' && empty($giftProduct?->name) && !empty($bag->nominal)) {
+                      $giftName = 'Сертификат на ' . number_format($bag->nominal, 0, '.', ' ') . ' ₽';
+                    }
+                  @endphp
+                  <tr>
+                    <td class="border p-2 text-left">{{ $giftName }}</td>
+                    <td class="border p-2">{{ $giftProduct?->article ?? $giftProduct?->sku ?? '' }}</td>
+                    <td class="border p-2">1</td>
+                    <td class="border p-2">{{ formatPrice($giftPrice) }}</td>
+                  </tr>
+                @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+        @endif
         <div class="mx-auto">
           <div class="flex justify-end">
             <div class="w-full md:w-auto flex-initial">
@@ -300,6 +345,9 @@
               class=" text-sm font-normal leading-none text-gray-400 ml-2">{{ date('H:i', strtotime($order->created_at)) }}</div>
           </div>
         </li>
+        @php
+          $this_date = null;
+        @endphp
         @if(isset($order->status_history))
           @php
             $this_date = date('d.m.Y', strtotime($order->created_at));
@@ -309,7 +357,7 @@
               @php
                 $staus_obj = \App\Models\Status::where('key', $status->status)->first();
               @endphp
-              @if($this_date!=date('d.m.Y', strtotime($status->created_at)))
+              @if(($this_date ?? null) != date('d.m.Y', strtotime($status->created_at)))
                 @php
                   $this_date = date('d.m.Y', strtotime($status->created_at));
                 @endphp
@@ -338,7 +386,7 @@
             <table class="table-auto w-full text-center border-collapse border border-gray-200 rounded-md text-sm">
               <thead>
               <tr>
-                <th class="bg-gray-100 border p-2 text-left">#</th>
+                <th class="bg-gray-100 border p-2 text-center">#</th>
                 <th class="bg-gray-100 border p-2">Код</th>
                 <th class="bg-gray-100 border p-2">Подарок</th>
                 <th class="bg-gray-100 border p-2">Дата присвоения</th>
@@ -351,6 +399,55 @@
                   <td class="border p-2">{{ $giftCoupon->code }}</td>
                   <td class="border p-2">{{ $giftCoupon->prize->name ?? '' }}</td>
                   <td class="border p-2">{{ \Carbon\Carbon::parse($giftCoupon->created_at)->format('d.m.Y H:i') }}</td>
+                </tr>
+              @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    @endif
+    @if($catInBagSession && $catInBagSession->bags->count() > 0)
+      <div id="tab-cat-in-bag-content" role="tabpanel">
+        <div class="mx-auto py-4">
+          <div class="relative overflow-x-auto">
+            <table class="table-auto w-full text-center border-collapse border border-gray-200 rounded-md text-sm">
+              <thead>
+              <tr>
+                <th class="bg-gray-100 border p-2 text-center">#</th>
+                <th class="bg-gray-100 border p-2">Код</th>
+                <th class="bg-gray-100 border p-2">Подарок</th>
+                <th class="bg-gray-100 border p-2">Присвоен</th>
+                <th class="bg-gray-100 border p-2">Открыт</th>
+                <th class="bg-gray-100 border p-2"></th>
+              </tr>
+              </thead>
+              <tbody>
+              @foreach($catInBagSession->bags->sortBy('position') as $i => $bag)
+                @php
+                  $isOpened = (bool)$bag->opened_at;
+                  $giftCode = $bag->data['gift_code'] ?? ($bag->data['voucher_code'] ?? '');
+                  $giftName = $bag->prize?->name ?? $bag->prize?->product?->name ?? $bag->product?->name ?? '';
+                  if ($bag->prize_type === 'certificate' && empty($giftName) && !empty($bag->nominal)) {
+                    $giftName = 'Сертификат на ' . number_format($bag->nominal, 0, '.', ' ') . ' ₽';
+                  }
+                  $displayGiftName = $giftName ?: 'Подарок';
+                @endphp
+                <tr>
+                  <td class="border p-2">{{ $i + 1 }}</td>
+                  <td class="border p-2">{{ $giftCode ?: '—' }}</td>
+                  <td class="border p-2">{{ $displayGiftName }}</td>
+                  <td class="border p-2">{{ \Carbon\Carbon::parse($bag->created_at)->format('d.m.Y H:i') }}</td>
+                  <td class="border p-2">
+                    {{ $isOpened ? \Carbon\Carbon::parse($bag->opened_at)->format('d.m.Y H:i') : '—' }}
+                  </td>
+                  <td class="border p-2">
+                    @if($isOpened)
+                      <i class="fas fa-eye text-green-600"></i>
+                    @else
+                      <i class="fas fa-eye-slash text-gray-400"></i>
+                    @endif
+                  </td>
                 </tr>
               @endforeach
               </tbody>

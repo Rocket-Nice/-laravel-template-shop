@@ -178,5 +178,8 @@
 
     </div>
 @endif
+@if(getSettings('catInBag'))
+    <x-cat-popup />
+@endif
 </body>
 </html>

@@ -297,6 +297,19 @@ document.addEventListener('DOMContentLoaded', function() {
       if (pvz_id.value){
         calculateModule('yandex', pvz_id.value)
       }
+
+      // set pvs to inputs
+      const yandex_pvz = document.getElementById('yandex-pvz')
+
+      yandex_pvz.addEventListener('change', function(e) {
+        const selectedOption = this.selectedOptions[0];
+
+        const pvzId = selectedOption.value;
+        const pvzAddress = selectedOption.dataset.address;
+
+        document.getElementById('yandex-pvz-id').value = pvzId;
+        document.getElementById('yandex-pvz-address').value = pvzAddress;
+      })
     }else if(shipping == 'pochta'){
       const pochtaPostcode = document.getElementById('pochta-postcode')
       if(pochtaPostcode && pochtaPostcode.value != ''){

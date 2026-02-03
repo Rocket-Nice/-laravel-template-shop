@@ -304,7 +304,11 @@
 
             <h3 class="d-headline-4 m-headline-3 text-center">Скидка</h3>
             <div class="space-y-12">
-              <div id="box-field-promocode" @if(getSettings('promo_1+1=3')) style="display:none;" @endif>
+              <div id="box-field-promocode"
+                   x-data="{ visible: true, init() { try { this.visible = localStorage.getItem('cat-popup-participated') !== '1'; } catch (e) {} window.addEventListener('cat-popup-participated', () => { this.visible = false; }); } }"
+                   x-init="init()"
+                   x-show="visible"
+                   @if(getSettings('promo_1+1=3')) style="display:none;" @endif>
                 <x-public.text-input type="text" id="promocode" name="promocode" placeholder="Промокод" value=""/>
               </div>
               <div id="box-field-voucher">
@@ -317,7 +321,11 @@
                 </div>
               @else
                 @if(!getSettings('promo_1+1=3') && !getSettings('promo20') && !getSettings('promo30') && auth()->check() && ($user->getBonuses() || (getSettings('diamondPromo2') && $user->getSuperBonuses())))
-                  <div id="box-field-bonuses" @if(getSettings('goldTicket')) style="display: none;" @endif>
+                  <div id="box-field-bonuses"
+                       x-data="{ visible: true, init() { try { this.visible = localStorage.getItem('cat-popup-participated') !== '1'; } catch (e) {} window.addEventListener('cat-popup-participated', () => { this.visible = false; }); } }"
+                       x-init="init()"
+                       x-show="visible"
+                       @if(getSettings('goldTicket')) style="display: none;" @endif>
 
                     <div class="text-black block d-text-body m-text-body">
                       @if(getSettings('diamondPromo2') && $user->getSuperBonuses())
@@ -459,6 +467,9 @@
                 {{--          <div class="text-center">*для участия в акции сумма ваших товаров должна быть не менее 3 500₽</div>--}}
               @endif
             </div>
+            @if(getSettings('catInBag') && $cart->count())
+              <x-cat-bag-in-basket :total="$cart->subtotal(0, '.', '')" />
+            @endif
             <div class="mt-12 mb-12 d-text-body m-text-body" id="coupons-info" @if(!($need_to_keys ?? false)) style="display: none;" @endif>
               <div class="p-6 space-y-4 bg-newGreenPromo30" id="coupons-content">
                 {!! $need_to_keys ?? '' !!}
@@ -651,6 +662,9 @@
       <input type="hidden" name="cart-total" id="cart-total" value="{{ $cart->subtotal(0, '.', '') }}">
       <input type="hidden" name="total_for_discount" id="total_for_discount" value="{{ $total_for_discount }}">
       <input type="hidden" name="cart-count" id="cart-count" value="{{ $cart->count() }}">
+      @if(getSettings('catInBag'))
+        <input type="hidden" name="cat_in_bag_participated" id="cat-in-bag-participated" value="0">
+      @endif
       <input type="hidden" name="shipping-price" id="shipping-price" value="{{ old('shipping-price') ?? 0 }}">
       <input type="hidden" name="shipping" id="shipping-method" value="{{ old('shipping-code') }}">
       <input type="hidden" name="cdek-pvz-id" id="cdek-pvz-id" value="{{ old('cdek-pvz-id') }}">
@@ -686,6 +700,23 @@
         }
       })
     </script>
+    @if(getSettings('catInBag'))
+      <script>
+        (function () {
+          const input = document.getElementById('cat-in-bag-participated');
+          if (!input) return;
+          const sync = () => {
+            try {
+              input.value = localStorage.getItem('cat-popup-participated') === '1' ? '1' : '0';
+            } catch (e) {
+              input.value = '0';
+            }
+          };
+          sync();
+          window.addEventListener('cat-popup-participated', sync);
+        })();
+      </script>
+    @endif
     <input type="hidden" class="js_data shipping_route" id="route_cdek_courier_regions"
            value="{{ route('getCdekCourierRegions') }}">
     <input type="hidden" class="js_data shipping_route" id="route_cdek_courier_cities"

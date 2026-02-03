@@ -7,15 +7,21 @@ class DashamailService
   protected PHPDasha $client;
   protected string $listId;
   protected string $secondaryList;
+  protected bool $enabled = false;
 
   public function __construct()
   {
+    $username = (string) config('services.dashamail.username');
+    $password = (string) config('services.dashamail.password');
+    $listId = (string) config('services.dashamail.list_id_main');
+
     $this->client = new PHPDasha(
-        config('services.dashamail.username'),
-        config('services.dashamail.password')
+        $username,
+        $password
     );
 
-    $this->listId = config('services.dashamail.list_id_main');
+    $this->listId = $listId;
+    $this->enabled = $username !== '' && $password !== '' && $listId !== '';
   }
 
   /**
@@ -26,6 +32,10 @@ class DashamailService
    */
   public function getEmailStatus(string $email): ?array
   {
+    if (!$this->enabled) {
+      return null;
+    }
+
     $members = $this->client->lists_get_members($this->listId, [
         'email' => $email,
     ]);
@@ -51,6 +61,10 @@ class DashamailService
    */
   public function addEmail(string $email, array $params = []): bool|string
   {
+    if (!$this->enabled) {
+      return true;
+    }
+
     $result = $this->client->lists_add_member($this->listId, $email, $params);
 
     return is_array($result) ? true : $result; // Возвращает true или текст ошибки
@@ -62,6 +76,10 @@ class DashamailService
 
   public function deleteEmail(string $email)
   {
+    if (!$this->enabled) {
+      return true;
+    }
+
     $results = [];
 
     // Удаляем из основного списка
@@ -86,6 +104,10 @@ class DashamailService
    */
   private function getMemberByList(string $email, string $listId): ?array
   {
+    if (!$this->enabled) {
+      return null;
+    }
+
     $members = $this->client->lists_get_members($listId, ['email' => $email]);
 
     if(is_array($members) && !empty($members)) {
@@ -108,6 +130,10 @@ class DashamailService
    */
   public function syncUsersToLists($users): array
   {
+    if (!$this->enabled) {
+      return [];
+    }
+
     $batchMain = [];
     $batchSecondary = [];
 

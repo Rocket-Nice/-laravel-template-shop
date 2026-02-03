@@ -125,7 +125,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:work --queue=' . implode(',', $queues) . ' --stop-when-empty --timeout=300')->everyMinute()->withoutOverlapping(1);
         $schedule->command('queue:work --queue=robokassa_payments --stop-when-empty --timeout=600')->everyMinute()->withoutOverlapping(1);
         $schedule->command('queue:work --queue=create_vouchers --stop-when-empty --timeout=1200')->everyMinute()->withoutOverlapping(1);
-        //      $schedule->command('queue:work --queue=compressImages --stop-when-empty --timeout=600')->everyMinute();
+        $schedule->command('queue:work --queue=compressImages --stop-when-empty --timeout=1200')->everyMinute();
         $schedule->command('queue:work --queue=check_cities --stop-when-empty --timeout=600')->everyMinute();
         //      $schedule->command('queue:work --queue=export_users --stop-when-empty --timeout=3600')->everyMinute();
         $schedule->command('queue:work --queue=send_to_sdek,send_to_boxberry,send_to_pochta,boxberry_tickets,cdek_tickets --stop-when-empty --timeout=600')->everyMinute()->withoutOverlapping(1);
@@ -135,8 +135,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:work --queue=telegram_mailing1 --timeout=600 --stop-when-empty')->everyMinute();
         $schedule->command('queue:retry --queue=telegram_queue')->everyFiveMinutes();
         //$schedule->command('queue:retry --queue=mail_queue')->hourly()
-        $schedule->command('queue:work --queue=send_to_x5post,x5post_tickets --timeout=600 --stop-when-empty')->everyMinute()->withoutOverlapping(1);;
-        $schedule->command('queue:work --queue=update_viewers --stop-when-empty')->everyMinute()->withoutOverlapping(1);;
+        $schedule->command('queue:work --queue=send_to_x5post,x5post_tickets --timeout=600 --stop-when-empty')->everyMinute()->withoutOverlapping(1);
+        $schedule->command('queue:work --queue=update_viewers --stop-when-empty')->everyMinute()->withoutOverlapping(1);
         $schedule->command('queue:work --stop-when-empty')->everyMinute()->withoutOverlapping(1);
 
         $schedule->call(function () {

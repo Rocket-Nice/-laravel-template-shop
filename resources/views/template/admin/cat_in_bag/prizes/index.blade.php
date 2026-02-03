@@ -41,6 +41,14 @@
         </select>
       </div>
       <div class="form-group">
+        <x-input-label for="is_certificate" :value="__('Сертификат')" />
+        <select id="is_certificate" name="is_certificate" class="form-control w-full">
+          <option value="">Все</option>
+          <option value="1" @if(request()->get('is_certificate') === '1') selected @endif>Да</option>
+          <option value="0" @if(request()->get('is_certificate') === '0') selected @endif>Нет</option>
+        </select>
+      </div>
+      <div class="form-group">
         <x-input-label for="availability" :value="__('Наличие')" />
         <select id="availability" name="availability" class="form-control w-full">
           <option value="">Все</option>
@@ -64,6 +72,7 @@
           <th class="bg-gray-100 border p-2">Остаток / Всего</th>
           <th class="bg-gray-100 border p-2">Статус</th>
           <th class="bg-gray-100 border p-2">Золотой</th>
+          <th class="bg-gray-100 border p-2">Сертификат</th>
           <th class="bg-gray-100 border p-2" style="width:60px"></th>
         </tr>
         </thead>
@@ -102,6 +111,13 @@
             <td class="border p-2">
               @if($prize->is_golden)
                 <span class="badge-yellow text-xs">Да</span>
+              @else
+                <span class="badge-gray text-xs">Нет</span>
+              @endif
+            </td>
+            <td class="border p-2">
+              @if($prize->is_certificate)
+                <span class="badge-blue text-xs">Да</span>
               @else
                 <span class="badge-gray text-xs">Нет</span>
               @endif

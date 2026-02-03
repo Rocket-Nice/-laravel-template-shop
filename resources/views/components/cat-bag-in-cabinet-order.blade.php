@@ -10,15 +10,9 @@
             в акции «Кот в мешке»!
         </p>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-[8px]">
-        {{-- Primary button --}}
+    <div class="flex gap-[8px]">
         <x-cat-bag-button type="button" onclick="window.dispatchEvent(new CustomEvent('open-cat-bags'))">
-            Открыть мешки
-        </x-cat-bag-button>
-
-        {{-- Secondary button счетчиком --}}
-        <x-cat-bag-button variant="outline" type="button" onclick="window.location.href='/cabinet/orders'">
-            В личный кабинет
+            Получить подарки
         </x-cat-bag-button>
     </div>
 </div>

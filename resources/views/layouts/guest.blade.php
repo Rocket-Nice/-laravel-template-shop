@@ -70,5 +70,8 @@
                 {{ $slot }}
             </div>
         </div>
+        @if(getSettings('catInBag'))
+            <x-cat-popup />
+        @endif
     </body>
 </html>

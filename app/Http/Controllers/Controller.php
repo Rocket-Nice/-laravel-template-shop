@@ -55,15 +55,15 @@ class Controller extends BaseController
       $user = 'admin';  // Укажите имя пользователя
       $pass = 'admin11';  // Укажите пароль
 
-      if (!isset($_SERVER['PHP_AUTH_USER']) ||
-          !isset($_SERVER['PHP_AUTH_PW']) ||
-          $_SERVER['PHP_AUTH_USER'] != $user ||
-          $_SERVER['PHP_AUTH_PW'] != $pass) {
-        header('WWW-Authenticate: Basic realm="My Private Area"');
-        header('HTTP/1.0 401 Unauthorized');
-        echo 'Требуется авторизация';  // Текст, который будет показан, если пользователь нажмёт "Отмена"
-        exit;
-      }
+      //if (!isset($_SERVER['PHP_AUTH_USER']) ||
+      //    !isset($_SERVER['PHP_AUTH_PW']) ||
+      //    $_SERVER['PHP_AUTH_USER'] != $user ||
+      //    $_SERVER['PHP_AUTH_PW'] != $pass) {
+      //  header('WWW-Authenticate: Basic realm="My Private Area"');
+      //  header('HTTP/1.0 401 Unauthorized');
+      //  echo 'Требуется авторизация';  // Текст, который будет показан, если пользователь нажмёт "Отмена"
+      //  exit;
+      //}
     }
 
   }

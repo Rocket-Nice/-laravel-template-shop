@@ -392,12 +392,15 @@ class CompressModule
         $relativePath = $matches[1];
       }
     }
+
     // Проверить наличие исходного файла
     if (!Storage::disk('public')->exists($relativePath)) {
-      throw new Exception('Исходное изображение не найдено. '.$relativePath);
+      //throw new Exception('Исходное изображение не найдено. '.$relativePath);
+      $originalImage = Image::make($url)->orientate();
+    } else {
+        $originalImage = Image::make(Storage::disk('public')->path($relativePath))->orientate();
     }
 
-    $originalImage = Image::make(Storage::disk('public')->path($relativePath))->orientate();
     $originalWidth = $originalImage->width();
 
     if ($maxWidth && $originalWidth > $maxWidth) {

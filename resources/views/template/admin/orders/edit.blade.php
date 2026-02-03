@@ -149,6 +149,9 @@
     <input type="hidden" name="cdek_courier-form-house" id="cdek_courier-form-house" value="{{ $order->data_shipping['cdek_courier-form-house'] ?? '' }}">
     <input type="hidden" name="cdek_courier-form-flat" id="cdek_courier-form-flat" value="{{ $order->data_shipping['cdek_courier-form-flat'] ?? '' }}">
     <input type="hidden" name="cdek_courier-form-address" id="cdek_courier-form-address" value="{{ $order->data_shipping['cdek_courier-form-address'] ?? '' }}">
+
+    <input type="hidden" name="yandex-pvz-id" id="yandex-pvz-id" value="{{ $order->data_shipping['yandex-pvz-id'] ?? '' }}">
+    <input type="hidden" name="yandex-pvz-address" id="yandex-pvz-address" value="{{ $order->data_shipping['yandex-pvz-address'] ?? '' }}">
   </form>
 
   <input type="hidden" class="js_data" id="route_getCdekCourierRegions" value="{{ route('getCdekCourierRegions') }}">

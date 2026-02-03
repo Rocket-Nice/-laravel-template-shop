@@ -57,6 +57,36 @@
                 {{--                  </div>--}}
               @endif
             @endif
+            @php($catInBagSession = (getSettings('catInBag') && $order->confirm)
+                ? \App\Models\CatInBagSession::query()->with(['bags.prize.product'])->where('order_id', $order->id)->first()
+                : null)
+            @php($catInBagCategoryIds = $catInBagSession?->visible_category_ids ?? [])
+            @php($catInBagBags = $catInBagSession?->bags ?? collect())
+            @php($catInBagOpenedCount = $catInBagSession?->opened_count ?? $catInBagBags->whereNotNull('opened_at')->count())
+            @php($catInBagOpenLimit = $catInBagSession?->open_limit ?? 0)
+            @php($catInBagHasUnopened = $catInBagOpenLimit > $catInBagOpenedCount)
+            @php($catInBagGiftBags = $catInBagBags->filter(function ($bag) {
+                return $bag->opened_at && $bag->prize_id && $bag->prize_type !== 'empty';
+            }))
+            @php($catInBagGifts = $catInBagGiftBags->map(function ($bag) {
+                $prize = $bag->prize;
+                $image = $prize?->data['image']['img'] ?? $prize?->data['image']['thumb'] ?? $prize?->image ?? null;
+                $price = $bag->nominal ?? $prize?->product?->price ?? 0;
+                return [
+                    'name' => $prize?->name ?? $prize?->product?->name ?? 'Подарок',
+                    'image' => $image,
+                    'price' => (int)$price,
+                ];
+            })->values())
+            @php($catInBagGiftsTotal = $catInBagGifts->sum('price'))
+            @if(getSettings('catInBag') && $order->confirm && $catInBagSession)
+              @if($catInBagHasUnopened)
+                <div class="mb-12">
+                  <x-cat-get-benefit />
+                </div>
+              @endif
+              <x-cat-bags :bag-count="$catInBagSession->bag_count" :open-limit="$catInBagSession->open_limit" :category-ids="$catInBagCategoryIds" :order-id="$order->id" :order-slug="$order->slug" />
+            @endif
             @if(!isset($order->data['store_coupon'])||!$order->data['store_coupon'])
               <div class="w-full">
                 <h2 class="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl uppercase mb-6">Товары</h2>
@@ -73,7 +103,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @forelse($cart as $item)
+                    @if(count($cart))
+                    @foreach($cart as $item)
                       @if(isset($item['raffle']))
                         @php($raffle = \App\Models\GiftCoupon::query()->where('code', $item['raffle'])->where('data->position', '!=', null)->first())
                         @if(!$raffle)
@@ -138,16 +169,22 @@
                   </span>
                         </td>
                       </tr>
-                    @empty
-                      <tr>
-                        <td colspan="5" class="p-4 text-gray-300 d-headline-4 m-headline-3">
-                          пусто
-                        </td>
-                      </tr>
-                    @endforelse
+                    @endforeach
+                    @else
+                    <tr>
+                      <td colspan="5" class="p-4 text-gray-300 d-headline-4 m-headline-3">
+                        пусто
+                      </td>
+                    </tr>
+                    @endif
                     </tbody>
                   </table>
                 </div>
+                @if(getSettings('catInBag') && $order->confirm && $catInBagSession && $catInBagGifts->isNotEmpty())
+                  <div class="mb-12">
+                    <x-cat-bag-gifts :gifts="$catInBagGifts" :original-total="$catInBagGiftsTotal" />
+                  </div>
+                @endif
                 @if(isset($gifts)&&!empty($gifts))
                   {{--                  <div class="mt-16 lg:mt-20">--}}
                   {{--                    <h2 class="text-lg lg:text-2xl font-montserrat uppercase ml-[120px] lg:ml-[150px]">Подарки LE--}}
@@ -411,4 +448,3 @@
     </div>
   </div>
 </x-cabinet-layout>
-

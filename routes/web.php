@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\CatInBag\GameController;
+use App\Http\Controllers\CatInBag\PreviewController;
 use App\Http\Controllers\ImageUploadController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,11 +17,6 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-// тест кота
-Route::get('/test-cat-popup', function () {
-  return view('test-cat-popup');
-});
 
 //Route::get('/test-memcached', function() {
 //  $key = 'test_key';
@@ -34,13 +32,29 @@ Route::get('/test-cat-popup', function () {
 //  return $cachedValue;
 //});
 
-$tg_notification = \App\Models\Setting::query()->where('key', 'tg_notifications_bot')->first();
-Route::post('/tg_webhook/' . ($tg_notification->value ?? ''), [\App\Http\Controllers\Admin\TelegramController::class, 'webhook'])->name('tg_webhook');
+$tg_notification_value = null;
+try {
+  if (!app()->runningInConsole() && Schema::hasTable('settings')) {
+    $tg_notification_value = \App\Models\Setting::query()
+        ->where('key', 'tg_notifications_bot')
+        ->value('value');
+  }
+} catch (\Throwable $e) {
+  $tg_notification_value = null;
+}
+Route::post('/tg_webhook/'.($tg_notification_value ?? ''), [\App\Http\Controllers\Admin\TelegramController::class, 'webhook'])->name('tg_webhook');
 //Route::post('/tg_webhook/'.($tg_notification->value ?? ''), function () {
 //  echo 1;
 //  Log::debug(print_r($_POST, true));
 //});
 Route::post('/upload', [ImageUploadController::class, 'upload']);
+Route::get('/cat-in-bag/preview-categories', [PreviewController::class, 'categories'])->name('cat_in_bag.preview_categories');
+Route::get('/cat-in-bag/{order:slug}/session', [GameController::class, 'session'])->name('cat_in_bag.session');
+Route::post('/cat-in-bag/{order:slug}/bag/{bag}/open', [GameController::class, 'openBag'])->name('cat_in_bag.bag.open');
+Route::post('/cat-in-bag/{order:slug}/assignment', [GameController::class, 'saveAssignment'])->name('cat_in_bag.assignment');
+Route::get('/cat-in-bag/order/{order:id}/session', [GameController::class, 'session'])->name('cat_in_bag.session_by_id');
+Route::post('/cat-in-bag/order/{order:id}/bag/{bag}/open', [GameController::class, 'openBag'])->name('cat_in_bag.bag.open_by_id');
+Route::post('/cat-in-bag/order/{order:id}/assignment', [GameController::class, 'saveAssignment'])->name('cat_in_bag.assignment_by_id');
 Route::get('/happy_coupon/{order}', [\App\Http\Controllers\HappyCouponController::class, 'index'])->name('happy_coupon');
 Route::post('/happy-coupon/{order:slug}/open', [\App\Http\Controllers\HappyCouponController::class, 'open'])->name('happy_coupon.open');
 Route::post('/happy-coupon/{order:slug}/opened', [\App\Http\Controllers\HappyCouponController::class, 'opened'])->name('happy_coupon.opened');
@@ -55,7 +69,7 @@ Route::get('r/{partner}', [App\Http\Controllers\ShortLinkController::class, 'par
 
 Route::get('/link', [\App\Http\Controllers\HomeController::class, 'link']);
 Route::get('/api-documentation', [\App\Http\Controllers\HomeController::class, 'apiDocumentation']);
-Route::middleware(['maintenance'])->group(function () {
+Route::middleware(['maintenance'])->group(function(){
   Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('page.index');
   Route::get('/about-us', [\App\Http\Controllers\HomeController::class, 'index'])->name('page.about');
   Route::get('/celebrities', [\App\Http\Controllers\HomeController::class, 'index'])->name('page.guests');
@@ -71,7 +85,7 @@ Route::middleware(['maintenance'])->group(function () {
   Route::get('/news', [\App\Http\Controllers\HomeController::class, 'blog'])->name('blog.index');
   Route::get('/news/c/{category}', [\App\Http\Controllers\HomeController::class, 'blog_category'])->name('blog.category');
   Route::get('/news/{article}', [\App\Http\Controllers\HomeController::class, 'blog_article'])->name('blog.article');
-  // Route::get('/product', [\App\Http\Controllers\ProductController::class, 'index'])->name('product.index');
+// Route::get('/product', [\App\Http\Controllers\ProductController::class, 'index'])->name('product.index');
   Route::get('/product/{product}', [\App\Http\Controllers\ProductController::class, 'index'])->name('product.index');
   Route::get('/product/{product}/reviews', [\App\Http\Controllers\ProductController::class, 'reviews'])->name('product.reviews');
   Route::get('/present/{product}', [\App\Http\Controllers\ProductController::class, 'present'])->name('product.present');
@@ -81,6 +95,7 @@ Route::middleware(['maintenance'])->group(function () {
   Route::get('/catalog/load', [\App\Http\Controllers\ProductController::class, 'loadProducts'])->name('product.loadProducts');
   Route::get('/catalog/{category}', [App\Http\Controllers\ProductController::class, 'category'])->name('catalog.category');
   Route::get('/our-presents', [\App\Http\Controllers\ProductController::class, 'presents'])->name('product.presents');
+
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -92,6 +107,6 @@ Route::middleware(['auth', 'permission:Доступ в партнерский к
   Route::get('/partner', [\App\Http\Controllers\Partner\HomeController::class, 'index'])->name('partner.cabinet.index');
 });
 
-require __DIR__ . '/order.php';
+require __DIR__.'/order.php';
 
 Route::middleware(['maintenance'])->get('/{page}', [\App\Http\Controllers\PageController::class, 'page'])->name('page');

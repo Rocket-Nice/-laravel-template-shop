@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CatInBagCategory;
 use App\Models\CatInBagPrize;
 use App\Models\Product;
+use App\Models\ProductType;
 use App\Services\CompressModule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +62,10 @@ class PrizeController extends Controller
             $prizes->where('is_golden', (bool)request()->is_golden);
         }
 
+        if (request()->filled('is_certificate')) {
+            $prizes->where('is_certificate', (bool)request()->is_certificate);
+        }
+
         if (request()->filled('availability')) {
             if (request()->availability === 'available') {
                 $prizes->whereColumn('total_qty', '>', 'used_qty');
@@ -88,13 +93,14 @@ class PrizeController extends Controller
         }
 
         $categories = CatInBagCategory::orderBy('name')->get();
-        $products = Product::select('id', 'sku', 'name')->orderBy('name')->get();
+        $productTypes = ProductType::orderBy('name')->get();
+        $products = Product::select('id', 'sku', 'name', 'type_id')->orderBy('name')->get();
 
         $seo = [
             'title' => 'Добавить подарок'
         ];
 
-        return view('template.admin.cat_in_bag.prizes.create', compact('seo', 'working_dir', 'categories', 'products'));
+        return view('template.admin.cat_in_bag.prizes.create', compact('seo', 'working_dir', 'categories', 'products', 'productTypes'));
     }
 
     public function store(Request $request)
@@ -125,6 +131,7 @@ class PrizeController extends Controller
             'product_id' => $request->product_id,
             'is_enabled' => $request->has('is_enabled'),
             'is_golden' => $request->has('is_golden'),
+            'is_certificate' => $request->has('is_certificate'),
             'data' => [
                 'image' => $image,
             ],
@@ -145,13 +152,14 @@ class PrizeController extends Controller
         }
 
         $categories = CatInBagCategory::orderBy('name')->get();
-        $products = Product::select('id', 'sku', 'name')->orderBy('name')->get();
+        $productTypes = ProductType::orderBy('name')->get();
+        $products = Product::select('id', 'sku', 'name', 'type_id')->orderBy('name')->get();
 
         $seo = [
             'title' => 'Редактировать ' . $prize->name
         ];
 
-        return view('template.admin.cat_in_bag.prizes.edit', compact('seo', 'working_dir', 'categories', 'products', 'prize'));
+        return view('template.admin.cat_in_bag.prizes.edit', compact('seo', 'working_dir', 'categories', 'products', 'productTypes', 'prize'));
     }
 
     public function update(Request $request, CatInBagPrize $prize)
@@ -186,6 +194,7 @@ class PrizeController extends Controller
             'product_id' => $request->product_id,
             'is_enabled' => $request->has('is_enabled'),
             'is_golden' => $request->has('is_golden'),
+            'is_certificate' => $request->has('is_certificate'),
             'data' => $data,
         ]);
 

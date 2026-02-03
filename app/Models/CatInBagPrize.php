@@ -17,6 +17,7 @@ class CatInBagPrize extends Model
         'data' => 'array',
         'is_enabled' => 'boolean',
         'is_golden' => 'boolean',
+        'is_certificate' => 'boolean',
     ];
 
     protected $fillable = [
@@ -28,6 +29,7 @@ class CatInBagPrize extends Model
         'product_id',
         'is_enabled',
         'is_golden',
+        'is_certificate',
         'data',
     ];
 

@@ -24,4 +24,9 @@ class CatInBagCategory extends Model
         'data',
         'is_enabled',
     ];
+
+    public function prizes()
+    {
+        return $this->hasMany(CatInBagPrize::class, 'category_id');
+    }
 }

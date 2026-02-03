@@ -65,7 +65,7 @@ deploy-develop:
     - chmod 644 ~/.ssh/known_hosts
     - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && (git fetch --all || git clone $CI_REPOSITORY_URL .) && git checkout $CI_COMMIT_BRANCH && git reset --hard HEAD && git pull origin $CI_COMMIT_BRANCH || exit 1"
     - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && export NVM_DIR=\"\$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\" && nvm use default && npm i && npm run build || exit 1"
-#    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan migrate --force || exit 1"
+    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan migrate --force || exit 1"
     - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan optimize:clear || exit 1"
   environment: ${ENVIRONMENT}
   only:
@@ -88,7 +88,7 @@ deploy-production:
     - chmod 644 ~/.ssh/known_hosts
     - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && (git fetch --all || git clone $CI_REPOSITORY_URL .) && git checkout $CI_COMMIT_BRANCH && git reset --hard HEAD && git pull origin $CI_COMMIT_BRANCH || exit 1"
     - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && export NVM_DIR=\"\$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\" && nvm use default && npm i && npm run build || exit 1"
-#    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan migrate --force || exit 1"
+    - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan migrate --force || exit 1"
     - ssh $DEPLOY_USER@$SERVER "cd $DEPLOY_PATH && sudo -u www-data php artisan optimize:clear || exit 1"
   environment: ${ENVIRONMENT}
   only:

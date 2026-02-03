@@ -7,9 +7,88 @@
       </h1>
     @endif
   </x-slot>
+  @php
+    $productsForSelect = $products->map(function ($product) {
+      return [
+        'id' => $product->id,
+        'name' => $product->name,
+        'sku' => $product->sku,
+        'type_id' => $product->type_id,
+      ];
+    })->values();
+    $selectedProductId = old('product_id');
+    $selectedTypeId = old('product_type_id');
+    if ($selectedTypeId === null && $selectedProductId) {
+      $selectedTypeId = optional($products->firstWhere('id', $selectedProductId))->type_id;
+    }
+  @endphp
   <x-slot name="script">
     <script>
       window.filemanger.working_dir = @json($working_dir);
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const typeSelect = document.getElementById('product_type_id');
+        const productSelect = document.getElementById('product_id');
+        if (!typeSelect || !productSelect) {
+          return;
+        }
+
+        const products = @json($productsForSelect);
+
+        const ensureChoices = () => {
+          if (productSelect._choices) {
+            return productSelect._choices;
+          }
+          if (!window.Choices) {
+            return null;
+          }
+          const options = {
+            shouldSort: false,
+            removeItemButton: true,
+            noChoicesText: 'Пусто',
+            itemSelectText: 'Выбрать'
+          };
+          const instance = new Choices(productSelect, options);
+          productSelect._choices = instance;
+          return instance;
+        };
+
+        const updateProducts = () => {
+          const instance = ensureChoices();
+          if (!instance) {
+            return;
+          }
+          const selectedId = productSelect.value;
+          const typeId = typeSelect.value;
+          const filtered = products.filter((product) => !typeId || String(product.type_id) === String(typeId));
+          const hasSelected = filtered.some((product) => String(product.id) === String(selectedId));
+          const choices = filtered.map((product) => ({
+            value: String(product.id),
+            label: product.name + ' (' + product.sku + ')',
+            selected: hasSelected && String(product.id) === String(selectedId),
+            customProperties: { keywords: product.sku }
+          }));
+
+          instance.clearChoices();
+          instance.setChoices(
+            [
+              { value: '', label: 'Выбрать', selected: !hasSelected, disabled: true, placeholder: true },
+              ...choices
+            ],
+            'value',
+            'label',
+            true
+          );
+
+          if (!hasSelected) {
+            productSelect.value = '';
+          }
+        };
+
+        updateProducts();
+        typeSelect.addEventListener('change', updateProducts);
+      });
     </script>
   </x-slot>
   <form action="{{ route('admin.cat-in-bag.prizes.store') }}" method="post">
@@ -70,11 +149,20 @@
             </select>
           </div>
           <div class="form-group">
+            <x-input-label for="product_type_id" :value="__('Тип товара')" />
+            <select id="product_type_id" name="product_type_id" class="form-control w-full">
+              <option value="">Выбрать</option>
+              @foreach($productTypes as $productType)
+                <option value="{{ $productType->id }}" @if($selectedTypeId == $productType->id) selected @endif>{{ $productType->name }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="form-group">
             <x-input-label for="product_id" :value="__('Товар из магазина')" />
-            <select id="product_id" name="product_id" class="multipleSelect form-control w-full" required>
+            <select id="product_id" name="product_id" class="multipleSelect form-control w-full" data-keywords="1" required>
               <option value="">Выбрать</option>
               @foreach($products as $product)
-                <option value="{{ $product->id }}" data-keywords="{{ $product->sku }}" @if(old('product_id') == $product->id) selected @endif>{{ $product->name }} ({{ $product->sku }})</option>
+                <option value="{{ $product->id }}" data-keywords="{{ $product->sku }}" data-type="{{ $product->type_id }}" @if(old('product_id') == $product->id) selected @endif>{{ $product->name }} ({{ $product->sku }})</option>
               @endforeach
             </select>
           </div>
@@ -90,6 +178,13 @@
               <x-checkbox id="is_golden" name="is_golden" value="1"
                           :checked="old('is_golden') ? true : false"/>
               <x-input-label for="is_golden" class="ml-2" :value="__('Дарится в золотом мешке')"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="flex items-center">
+              <x-checkbox id="is_certificate" name="is_certificate" value="1"
+                          :checked="old('is_certificate') ? true : false"/>
+              <x-input-label for="is_certificate" class="ml-2" :value="__('Сертификат')"/>
             </div>
           </div>
         </div>

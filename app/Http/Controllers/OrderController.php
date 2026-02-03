@@ -18,7 +18,10 @@ use App\Models\ShippingMethod;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Models\VoucherTransactions;
+use App\Models\CatInBagPreview;
 use App\Services\HappyCoupon;
+use App\Services\CatInBag\GameService;
+use App\Services\CatInBag\PreviewService;
 use App\Services\MailSender;
 use App\Services\Promo113;
 use App\Services\TelegramSender;
@@ -295,6 +298,17 @@ class OrderController extends Controller
                 'mailing' => $request->mailing,
             ]
         ];
+        if (getSettings('catInBag')) {
+            $catInBagParticipated = $request->boolean('cat_in_bag_participated')
+                || $request->cookie('cat_in_bag_participated') === '1';
+            $data['cat_in_bag_participated'] = $catInBagParticipated;
+            if ($catInBagParticipated) {
+                $previewData = app(PreviewService::class)->getPreview($request);
+                if (!empty($previewData['preview']?->category_ids)) {
+                    $data['cat_in_bag_visible_category_ids'] = $previewData['preview']->category_ids;
+                }
+            }
+        }
         // проверяем промокоды и сертификаты
         $discount = 0;
         $referrer = null;
@@ -737,6 +751,51 @@ class OrderController extends Controller
                 //          (new HappyCoupon())->setPrizeToOrder($order);
                 //        }
             }
+
+            if (getSettings('catInBag') && !($order->data['is_voucher'] ?? false)) {
+                $catInBagParticipated = (bool)($order_data['cat_in_bag_participated'] ?? false);
+                $visibleCategoryIds = $order_data['cat_in_bag_visible_category_ids'] ?? [];
+                if (empty($visibleCategoryIds) && $order->user_id) {
+                    $preview = CatInBagPreview::query()
+                        ->where('user_id', $order->user_id)
+                        ->where('expires_at', '>', now())
+                        ->orderByDesc('id')
+                        ->first();
+                    $visibleCategoryIds = $preview?->category_ids ?? [];
+                }
+
+                $goodsTotal = (int)($order_data['total'] ?? 0);
+                $cartTotal = 0;
+                $parsePrice = static function ($value): int {
+                    if (is_int($value)) {
+                        return $value;
+                    }
+                    if (is_float($value)) {
+                        return (int)round($value);
+                    }
+                    if (is_numeric($value)) {
+                        return (int)round((float)$value);
+                    }
+                    $normalized = str_replace([' ', '₽'], '', (string)$value);
+                    $normalized = str_replace(',', '.', $normalized);
+                    return (int)round((float)$normalized);
+                };
+                if (!empty($order->data_cart) && is_array($order->data_cart)) {
+                    foreach ($order->data_cart as $item) {
+                        $price = $parsePrice($item['price'] ?? 0);
+                        $qty = (int)($item['qty'] ?? 1);
+                        $cartTotal += $price * $qty;
+                    }
+                }
+                $goodsTotal = max($goodsTotal, $cartTotal);
+                if ($goodsTotal <= 0 && isset($order->amount)) {
+                    $goodsTotal = (int)$order->amount;
+                }
+
+                if ($catInBagParticipated && $goodsTotal >= 4000 && count($visibleCategoryIds) >= 2) {
+                    (new GameService())->createSession($goodsTotal, $order->id, $order->user_id, $visibleCategoryIds);
+                }
+            }
             $coupon = $order->coupon()->first();
             if (getSettings('promo_1+1=3') && !$coupon) {
                 Promo113::gift($order);
@@ -771,7 +830,8 @@ class OrderController extends Controller
                 //        }
                 $message = [
                     'title' => 'Спасибо за оплату заказа',
-                    'text' => 'Номер вашего заказа ' . $order->getOrderNumber() . '. Все инструкции отправлены на ваш email, указанный при оформлении заказа.'
+                    'text' => 'Номер вашего заказа ' . $order->getOrderNumber() . '.',
+                    'text-confirm-email' => 'Все инструкции отправлены на ваш email, указанный при оформлении заказа.'
                 ];
                 $coupon = $order->coupon()->first();
             } else {

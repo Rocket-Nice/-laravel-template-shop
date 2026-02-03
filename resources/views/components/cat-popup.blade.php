@@ -1,14 +1,97 @@
-<button onclick="window.dispatchEvent(new CustomEvent('open-cat-popup'))"
-    class="fixed bottom-[16px] right-[16px] md:bottom-[32px] md:right-[32px] z-40 hover:scale-105 transition-transform duration-200">
-    <picture>
-        <source media="(max-width: 767px)" srcset="img/cat-bag/popup-cat-open-mobile.png">
-        <source media="(min-width: 768px)" srcset="img/cat-bag/popup-cat-open.png">
-        <img src="img/cat-bag/popup-cat-open.png" alt="Открыть подарки" class="w-full">
-    </picture>
-</button>
+<script>
+    if (!window.__catPopupInit) {
+        window.__catPopupInit = true;
+        window.addEventListener('load', function () {
+            const storageKey = 'cat-popup-opened-date';
+            const participateKey = 'cat-popup-participated';
+            const formatter = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Europe/Moscow',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            const todayMsk = formatter.format(new Date());
+            try {
+                if (localStorage.getItem(storageKey) === todayMsk) {
+                    window.__catPopupOpenedOnce = true;
+                }
+            } catch (e) {}
+
+            try {
+                if (localStorage.getItem(participateKey) === '1') {
+                    window.__catPopupParticipated = true;
+                }
+            } catch (e) {}
+
+            window.addEventListener('open-cat-popup', function () {
+                window.__catPopupOpenedOnce = true;
+                try {
+                    localStorage.setItem(storageKey, todayMsk);
+                } catch (e) {}
+            }, { once: true });
+
+            if (window.__catPopupTimer) {
+                clearTimeout(window.__catPopupTimer);
+            }
+            window.__catPopupOpenedOnce = window.__catPopupOpenedOnce || false;
+            window.__catPopupTimer = setTimeout(function () {
+                if (!window.__catPopupOpenedOnce && !window.__catPopupParticipated) {
+                    window.dispatchEvent(new CustomEvent('open-cat-popup'));
+                }
+            }, 30000);
+        });
+    }
+</script>
 
 <div x-data="{
     open: false,
+    participated: false,
+    loading: false,
+    categories: [],
+    refreshCount: 0,
+    refreshLimit: 3,
+    getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+        return null;
+    },
+    setParticipatedCookie() {
+        try {
+            document.cookie = 'cat_in_bag_participated=1; path=/; max-age=86400';
+        } catch (e) {}
+    },
+    init() {
+        try {
+            this.participated = localStorage.getItem('cat-popup-participated') === '1';
+        } catch (e) {}
+        if (!this.participated) {
+            this.participated = this.getCookie('cat_in_bag_participated') === '1';
+        }
+        if (window.__catPopupParticipated) {
+            this.participated = true;
+        }
+        window.addEventListener('open-cat-popup', () => {
+            if (this.participated) {
+                return;
+            }
+            this.open = true;
+            this.lock();
+            if (this.categories.length === 0) {
+                this.loadCategories(false);
+            }
+        });
+        window.addEventListener('cat-popup-participated', () => {
+            this.participated = true;
+        });
+        window.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && this.open) {
+                this.reset();
+            }
+        });
+    },
     lock() {
         document.body.classList.add('overflow-hidden')
     },
@@ -18,18 +101,56 @@
     reset() {
         this.open = false;
         this.unlock();
+    },
+    participate() {
+        this.participated = true;
+        try {
+            localStorage.setItem('cat-popup-participated', '1');
+        } catch (e) {}
+        this.setParticipatedCookie();
+        window.dispatchEvent(new CustomEvent('cat-popup-participated'));
+        this.reset();
+    },
+    get refreshLabel() {
+        if (this.refreshCount >= (this.refreshLimit - 1)) {
+            return `${this.refreshLimit} из ${this.refreshLimit}`;
+        }
+        return `Обновить ${this.refreshCount + 1} из ${this.refreshLimit}`;
+    },
+    get canRefresh() {
+        return this.refreshCount < (this.refreshLimit - 1);
+    },
+    async loadCategories(forceRefresh = false) {
+        if (this.loading) return;
+        this.loading = true;
+        try {
+            const url = new URL('/cat-in-bag/preview-categories', window.location.origin);
+            if (forceRefresh) {
+                url.searchParams.set('refresh', '1');
+            }
+            const response = await fetch(url.toString(), { credentials: 'same-origin' });
+            const data = await response.json();
+            this.categories = Array.isArray(data.categories) ? data.categories.slice(0, 2) : [];
+            this.refreshCount = data.refresh_count ?? 0;
+            this.refreshLimit = data.refresh_limit ?? 3;
+        } catch (e) {
+            this.categories = [];
+        } finally {
+            this.loading = false;
+        }
     }
-}" x-init="window.addEventListener('open-cat-popup', () => {
-    open = true;
-    lock();
-});
+}" x-init="init()">
 
-window.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && open) {
-        reset();
-    }
-});" x-show="open" x-cloak
-    class="fixed inset-0 z-50 flex items-center justify-center">
+<button x-show="!participated" x-cloak onclick="window.dispatchEvent(new CustomEvent('open-cat-popup'))"
+    class="fixed bottom-[16px] right-[16px] md:bottom-[32px] md:right-[32px] z-40 hover:scale-105 transition-transform duration-200">
+    <picture>
+        <source media="(max-width: 767px)" srcset="{{ asset('img/cat-bag/popup-cat-open-mobile.png') }}">
+        <source media="(min-width: 768px)" srcset="{{ asset('img/cat-bag/popup-cat-open.png') }}">
+        <img src="{{ asset('img/cat-bag/popup-cat-open.png') }}" alt="Открыть подарки" class="w-full">
+    </picture>
+</button>
+
+<div x-show="open && !participated" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
 
     <div class="absolute inset-0 bg-black/50" @click="reset()"></div>
 
@@ -58,33 +179,38 @@ window.addEventListener('keydown', e => {
         </h2>
 
         <div class="grid grid-cols-4 mb-4 bg-white py-4">
-            @php
-                $gifts = [
-                    ['title' => 'Сыворотка из ассортимента', 'img' => 'img/cat-bag/gift-1.png'],
-                    ['title' => 'Крем из ассортимента', 'img' => 'img/cat-bag/gift-2.png'],
-                    ['title' => 'Кот в мешке', 'img' => 'img/cat-bag/gift-cat.png'],
-                    ['title' => 'Золотой мешок от 10 000 ₽', 'img' => 'img/cat-bag/gift-gold.png'],
-                ];
-            @endphp
+            <template x-if="loading && categories.length === 0">
+                <div class="col-span-4 text-center text-sm text-gray-500">Загружаем категории...</div>
+            </template>
 
-            @foreach ($gifts as $gift)
+            <template x-for="category in categories" :key="category.id">
                 <label class="group cursor-pointer text-center">
                     <input type="checkbox" class="hidden">
-                    <img src="{{ $gift['img'] }}" alt="" class="mx-auto mb-2 h-auto object-contain">
-                    <p class="text-[10px] text-[#414141] leading-3 font-light px-2">
-                        {{ $gift['title'] }}
-                    </p>
+                    <img :src="category.image_thumb || category.image" alt="" class="mx-auto mb-2 h-auto object-contain">
+                    <p class="text-[10px] text-[#414141] leading-3 font-light px-2" x-text="category.name"></p>
                 </label>
-            @endforeach
+            </template>
+
+            <label class="group cursor-pointer text-center">
+                <input type="checkbox" class="hidden">
+                <img src="{{ asset('img/cat-bag/gift-cat.png') }}" alt="" class="mx-auto mb-2 h-auto object-contain">
+                <p class="text-[10px] text-[#414141] leading-3 font-light px-2">Кот в мешке</p>
+            </label>
+
+            <label class="group cursor-pointer text-center">
+                <input type="checkbox" class="hidden">
+                <img src="{{ asset('img/cat-bag/gift-gold.png') }}" alt="" class="mx-auto mb-2 h-auto object-contain">
+                <p class="text-[10px] text-[#414141] leading-3 font-light px-2">Золотой мешок от 10 000 ₽</p>
+            </label>
         </div>
 
         <div class="flex flex-row gap-2 justify-center mb-4 px-4">
-            <x-cat-bag-button>
+            <x-cat-bag-button type="button" @click="participate(); window.location.href='{{ url('/catalog') }}'">
                 Участвовать
             </x-cat-bag-button>
 
-            <x-cat-bag-button variant="outline" counter="1 из 3">
-                Обновить
+            <x-cat-bag-button variant="outline" x-bind:disabled="!canRefresh || loading" @click="loadCategories(true)">
+                <span x-text="refreshLabel"></span>
             </x-cat-bag-button>
         </div>
 
@@ -105,4 +231,5 @@ window.addEventListener('keydown', e => {
             </div>
         </div>
     </div>
+</div>
 </div>

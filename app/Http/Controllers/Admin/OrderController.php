@@ -33,6 +33,7 @@ use App\Jobs\SendOrdersToBoxberryJob;
 use App\Jobs\SendOrdersToCdekJob;
 use App\Jobs\SendOrdersToPochtaJob;
 use App\Jobs\SendOrdersToX5PostJob;
+use App\Models\CatInBagSession;
 use App\Services\MailSender;
 use App\Services\Smsru\Sender;
 use App\Services\TelegramSender;
@@ -122,10 +123,14 @@ class OrderController extends Controller
             }
         }
         $order->data_cart = $cart;
+        $catInBagSession = CatInBagSession::query()
+            ->where('order_id', $order->id)
+            ->with(['bags.prize', 'bags.product'])
+            ->first();
         $seo = [
             'title' => 'Заказ ' . $order->getOrderNumber()
         ];
-        return view('template.admin.orders.show', compact('order', 'seo', 'pickup'));
+        return view('template.admin.orders.show', compact('order', 'seo', 'pickup', 'catInBagSession'));
     }
 
     public function create()
@@ -424,7 +429,7 @@ class OrderController extends Controller
             $validate['ozon-pvz-id'] = ['required', 'string', 'max:30'];
             $validate['ozon-pvz-address'] = ['required', 'string', 'max:255'];
         } elseif ($request['shipping'] == 'yandex') {
-            $validate['yandex-pvz-id'] = ['required', 'string', 'max:30'];
+            $validate['yandex-pvz-id'] = ['required', 'string', 'max:40'];
             $validate['yandex-pvz-address'] = ['required', 'string', 'max:255'];
         } elseif ($request['shipping'] == 'x5post') {
             $validate['x5post-pvz-id'] = ['required', 'string', 'max:30'];

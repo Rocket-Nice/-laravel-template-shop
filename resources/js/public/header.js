@@ -145,11 +145,20 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   // dropdown mobile menu
   document.querySelectorAll('.group').forEach(function(group) {
-    group.querySelector('button').addEventListener('click', function() {
-      group.querySelector('.nav-parent .nav-arrow').classList.toggle('rotate-180');
-      group.querySelector('.dropdown-content').classList.toggle('hidden');
+    const toggleButton = group.querySelector('button');
+    if (!toggleButton) {
+      return;
+    }
+    toggleButton.addEventListener('click', function() {
+      const arrow = group.querySelector('.nav-parent .nav-arrow');
+      if (arrow) {
+        arrow.classList.toggle('rotate-180');
+      }
+      const dropdown = group.querySelector('.dropdown-content');
+      if (dropdown) {
+        dropdown.classList.toggle('hidden');
+      }
     });
   });
   // dropdown mobile menu end
 });
-

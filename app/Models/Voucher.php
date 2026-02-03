@@ -18,6 +18,7 @@ class Voucher extends Model
 
   protected $casts = [
       'options' => 'array',
+      'is_gift' => 'boolean',
       'available_until' => 'datetime:Y-m-d H:i:s',
       'available_from' => 'datetime:Y-m-d H:i:s',
       'used_at' => 'datetime:Y-m-d H:i:s'
@@ -35,6 +36,7 @@ class Voucher extends Model
         'save_amount',
         'nominal_value',
         'options',
+        'is_gift',
     ];
 
   protected static function boot()

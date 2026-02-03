@@ -396,14 +396,25 @@ const customSearch = function(value, item) {
   let isTextMatch = item.label.toLowerCase().includes(value.toLowerCase());
 
   // Проверяем совпадения по ключевым словам
-  let keywordAttribute = item.element.getAttribute('data-keywords');
-  let isKeywordMatch = keywordAttribute ? keywordAttribute.toLowerCase().includes(value.toLowerCase()) : false;
+  let keywordAttribute = '';
+  if (item.element && item.element.getAttribute) {
+    keywordAttribute = item.element.getAttribute('data-keywords') || '';
+  }
+  let keywordCustom = '';
+  if (item.customProperties && item.customProperties.keywords) {
+    keywordCustom = item.customProperties.keywords;
+  }
+  let keyword = keywordAttribute || keywordCustom;
+  let isKeywordMatch = keyword ? keyword.toLowerCase().includes(value.toLowerCase()) : false;
 
   return isTextMatch || isKeywordMatch;
 };
 function multipleSelect(){
   const multipleSelects = document.querySelectorAll('select.multipleSelect');
   multipleSelects.forEach((select)=>{
+    if (select._choices) {
+      return;
+    }
     const options = {
       shouldSort: false,
       removeItemButton: true,
@@ -413,7 +424,8 @@ function multipleSelect(){
     if(typeof select.dataset.keywords != "undefined"){
       options.searchFn = customSearch
     }
-    new Choices(select, options)
+    const instance = new Choices(select, options)
+    select._choices = instance
   })
 }
 if(document.querySelectorAll('select.multipleSelect').length>0){
