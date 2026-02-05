@@ -299,8 +299,7 @@ class OrderController extends Controller
             ]
         ];
         if (getSettings('catInBag')) {
-            $catInBagParticipated = $request->boolean('cat_in_bag_participated')
-                || $request->cookie('cat_in_bag_participated') === '1';
+            $catInBagParticipated = true;
             $data['cat_in_bag_participated'] = $catInBagParticipated;
             if ($catInBagParticipated) {
                 $previewData = app(PreviewService::class)->getPreview($request);
@@ -753,7 +752,7 @@ class OrderController extends Controller
             }
 
             if (getSettings('catInBag') && !($order->data['is_voucher'] ?? false)) {
-                $catInBagParticipated = (bool)($order_data['cat_in_bag_participated'] ?? false);
+                $catInBagParticipated = true;
                 $visibleCategoryIds = $order_data['cat_in_bag_visible_category_ids'] ?? [];
                 if (empty($visibleCategoryIds) && $order->user_id) {
                     $preview = CatInBagPreview::query()

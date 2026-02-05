@@ -14,7 +14,7 @@
     if (!$category) {
         return null;
     }
-    return $category->data['image']['thumb'] ?? $category->data['image']['img'] ?? $category->image;
+    return $category->data['image']['img'] ?? $category->data['image']['thumb'] ?? $category->image;
 })->filter()->values()->all())
 @php($routeOrder = request()->route('order'))
 @php($routeOrderId = $routeOrder instanceof \App\Models\Order ? $routeOrder->id : (is_numeric($routeOrder) ? $routeOrder : null))
@@ -110,7 +110,7 @@ window.addEventListener('keydown', e => {
                         Перемешать
                     </x-cat-bag-button>
 
-                    <x-cat-bag-button variant="outline" class="cabinet-btn hidden mt-2" type="button"
+                    <x-cat-bag-button class="cabinet-btn hidden mt-2" type="button"
                         onclick="window.location.href='/cabinet/orders'">
                         В личный кабинет
                     </x-cat-bag-button>

@@ -30,7 +30,7 @@ window.addEventListener('keydown', e => {
 });" x-show="open" x-cloak
     class="fixed inset-0 z-50 flex items-center justify-center">
 
-    <div class="absolute inset-0 bg-black" @click="reset()"></div>
+    <div class="absolute inset-0 bg-black/50" @click="reset()"></div>
 
     <div :class="{
         'h-screen': isFullscreen || window.innerWidth >= 768,

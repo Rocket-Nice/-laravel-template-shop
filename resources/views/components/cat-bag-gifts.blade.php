@@ -11,7 +11,7 @@
 @php($fallbackImage = '/img/cat-bag/animation-sack/product.svg')
 
 @if($giftItems->isNotEmpty())
-  <div class="relative flex flex-col gap-[20px] p-5 bg-gradient-to-r from-[#9BACA1] to-[#D7DACD]">
+  <div class="relative flex flex-col gap-[20px] p-5 bg-gradient-to-l from-[#9BACA1] to-[#D7DACD]">
       <div class="absolute -top-10 -left-16">
           <img src="{{ asset('img/cat-bag/cat-single-big.png') }}" alt="single">
       </div>
@@ -36,7 +36,7 @@
           @endforeach
 
           <div class="flex justify-between mt-3">
-              <p class="text-xl font-[600] font_main-font">Сумма:</p>
+              <p class="text-[24px] font-[600] font_main-font italic">Сумма:</p>
               <div class="flex gap-[12px] items-center font-inter_font">
                   <p class="text-[20px] leading-[28px]">{{ $zeroFormatted }}</p>
                   <p class="text-[20px] line-through leading-[28px]">{{ $totalFormatted }}</p>

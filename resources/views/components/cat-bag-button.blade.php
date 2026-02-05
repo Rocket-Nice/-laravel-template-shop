@@ -29,6 +29,6 @@
     {{ $slot }}
 
     @if ($counter)
-        <span class="ml-2 text-xs">{{ $counter }}</span>
+        <span class="ml-[5px] text-xs" x-text="{{ $counter }}"></span>
     @endif
 </button>

@@ -34,6 +34,7 @@ class PreviewController extends Controller
         }
 
         $categories = CatInBagCategory::query()
+            ->dontCache()
             ->whereIn('id', $preview->category_ids ?? [])
             ->get()
             ->map(function (CatInBagCategory $category) {

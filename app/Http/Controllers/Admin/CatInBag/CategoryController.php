@@ -12,7 +12,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = CatInBagCategory::query();
+        $categories = CatInBagCategory::query()->dontCache();
         if (request()->keyword) {
             $keyword = trim(request()->keyword);
             $categories->where(function ($query) use ($keyword) {
@@ -79,6 +79,9 @@ class CategoryController extends Controller
 
     public function edit(CatInBagCategory $category)
     {
+        $category = CatInBagCategory::query()
+            ->dontCache()
+            ->findOrFail($category->id);
         $working_dir = '/shares/cat_in_bag/categories';
         if (!file_exists(storage_path('app/public/photos' . $working_dir))) {
             mkdir(storage_path('app/public/photos' . $working_dir), 0777, true);
@@ -112,12 +115,15 @@ class CategoryController extends Controller
             $data['image'] = $image;
         }
 
-        $category->update([
-            'name' => $request->name,
-            'image' => $image['img'] ?? $category->image,
-            'data' => $data,
-            'is_enabled' => $request->has('is_enabled'),
-        ]);
+        CatInBagCategory::query()
+            ->dontCache()
+            ->whereKey($category->id)
+            ->update([
+                'name' => $request->name,
+                'image' => $image['img'] ?? $category->image,
+                'data' => $data,
+                'is_enabled' => $request->boolean('is_enabled'),
+            ]);
 
         CatInBagCategory::flushQueryCache();
 

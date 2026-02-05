@@ -39,6 +39,14 @@
                     window.dispatchEvent(new CustomEvent('open-cat-popup'));
                 }
             }, 30000);
+
+            const openFromHash = () => {
+                if (window.location.hash === '#cat-popup') {
+                    window.dispatchEvent(new CustomEvent('open-cat-popup'));
+                }
+            };
+            openFromHash();
+            window.addEventListener('hashchange', openFromHash);
         });
     }
 </script>
@@ -74,9 +82,6 @@
             this.participated = true;
         }
         window.addEventListener('open-cat-popup', () => {
-            if (this.participated) {
-                return;
-            }
             this.open = true;
             this.lock();
             if (this.categories.length === 0) {
@@ -113,9 +118,9 @@
     },
     get refreshLabel() {
         if (this.refreshCount >= (this.refreshLimit - 1)) {
-            return `${this.refreshLimit} из ${this.refreshLimit}`;
+            return `(${this.refreshLimit} из ${this.refreshLimit})`;
         }
-        return `Обновить ${this.refreshCount + 1} из ${this.refreshLimit}`;
+        return `(${this.refreshCount + 1} из ${this.refreshLimit})`;
     },
     get canRefresh() {
         return this.refreshCount < (this.refreshLimit - 1);
@@ -141,16 +146,12 @@
     }
 }" x-init="init()">
 
-<button x-show="!participated" x-cloak onclick="window.dispatchEvent(new CustomEvent('open-cat-popup'))"
+<button x-cloak onclick="window.dispatchEvent(new CustomEvent('open-cat-popup'))"
     class="fixed bottom-[16px] right-[16px] md:bottom-[32px] md:right-[32px] z-40 hover:scale-105 transition-transform duration-200">
-    <picture>
-        <source media="(max-width: 767px)" srcset="{{ asset('img/cat-bag/popup-cat-open-mobile.png') }}">
-        <source media="(min-width: 768px)" srcset="{{ asset('img/cat-bag/popup-cat-open.png') }}">
-        <img src="{{ asset('img/cat-bag/popup-cat-open.png') }}" alt="Открыть подарки" class="w-full">
-    </picture>
+    <img src="{{ asset('img/cat-bag/popup-cat-open.png') }}" alt="Открыть подарки" class="w-full max-w-[111px] md:max-w-[125px]">
 </button>
 
-<div x-show="open && !participated" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
+<div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
 
     <div class="absolute inset-0 bg-black/50" @click="reset()"></div>
 
@@ -186,21 +187,21 @@
             <template x-for="category in categories" :key="category.id">
                 <label class="group cursor-pointer text-center">
                     <input type="checkbox" class="hidden">
-                    <img :src="category.image_thumb || category.image" alt="" class="mx-auto mb-2 h-auto object-contain">
+                    <img :src="category.image || category.image_thumb" alt="" class="mx-auto mb-2 h-auto object-contain max-w-[90px] md:max-w-[120px] w-full max-h-[90px] md:max-h-[120px] h-full">
                     <p class="text-[10px] text-[#414141] leading-3 font-light px-2" x-text="category.name"></p>
                 </label>
             </template>
 
             <label class="group cursor-pointer text-center">
                 <input type="checkbox" class="hidden">
-                <img src="{{ asset('img/cat-bag/gift-cat.png') }}" alt="" class="mx-auto mb-2 h-auto object-contain">
+                <img src="{{ asset('img/cat-bag/gift-cat.png') }}" alt="" class="mx-auto mb-2 h-auto object-contain max-w-[90px] md:max-w-[120px] w-full max-h-[90px] md:max-h-[120px] h-full">
                 <p class="text-[10px] text-[#414141] leading-3 font-light px-2">Кот в мешке</p>
             </label>
 
             <label class="group cursor-pointer text-center">
                 <input type="checkbox" class="hidden">
-                <img src="{{ asset('img/cat-bag/gift-gold.png') }}" alt="" class="mx-auto mb-2 h-auto object-contain">
-                <p class="text-[10px] text-[#414141] leading-3 font-light px-2">Золотой мешок от 10 000 ₽</p>
+                <img src="{{ asset('img/cat-bag/gift-gold.png') }}" alt="" class="mx-auto mb-2 h-auto object-contain max-w-[90px] md:max-w-[120px] w-full max-h-[90px] md:max-h-[120px] h-full">
+                <p class="text-[10px] text-[#414141] leading-3 font-light px-2">Золотой мешок <br> от 10 000 ₽</p>
             </label>
         </div>
 
@@ -209,8 +210,13 @@
                 Участвовать
             </x-cat-bag-button>
 
-            <x-cat-bag-button variant="outline" x-bind:disabled="!canRefresh || loading" @click="loadCategories(true)">
-                <span x-text="refreshLabel"></span>
+            <x-cat-bag-button 
+                variant="outline" 
+                x-bind:disabled="!canRefresh || loading" 
+                @click="loadCategories(true)"
+                :counter="'refreshLabel'"
+            >
+                Обновить
             </x-cat-bag-button>
         </div>
 
@@ -218,15 +224,24 @@
             После обновления предыдущие подарки не сохраняются
         </p>
 
-        <div class="grid grid-cols-3 text-[13px] leading-tight text-[#414141] text-center">
-            <div class="p-[22px] md:p-[19px] flex flex-row justify-center items-center">
-                От 4 000 ₽ —<br>откроете 1 🎁
+        <div class="grid grid-cols-3 text-[10px] font-[300] leading-[14px] text-[#414141] text-center mb-[16px]">
+            <div class="p-[8px] md:p-[19px] flex flex-col justify-center items-center">
+                От 4 000 ₽ —<br>
+                <div class="flex items-center">
+                    откроете 1 <img src="{{ asset('img/cat-bag/meshok-little.png') }}" class="w-[16px]" alt="">
+                </div>
             </div>
-            <div class="p-[22px] md:p-[19px] flex flex-row justify-center items-center">
-                От 6 500 ₽ —<br>откроете 2 🎁
+            <div class="p-[8px] md:p-[19px] flex flex-col justify-center items-center border-x border-solid border-[#E6E6E6]">
+                От 6 500 ₽ —<br>
+                <div class="flex items-center">
+                    откроете 2 <img src="{{ asset('img/cat-bag/meshok-little.png') }}" class="w-[16px]" alt="">
+                </div>
             </div>
-            <div class="p-[22px] md:p-[19px] flex flex-row justify-center items-center">
-                От 10 000 ₽ —<br>откроете 3 🎁<br>
+            <div class="p-[8px] md:p-[19px] flex flex-col justify-center items-center">
+                От 10 000 ₽ <br>
+                <div class="flex items-center">
+                    откройте 3 <img src="{{ asset('img/cat-bag/meshok-little.png') }}" class="w-[16px]" alt=""> —
+                </div>
                 один из них может быть золотым
             </div>
         </div>

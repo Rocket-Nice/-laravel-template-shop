@@ -73,21 +73,21 @@
                 $image = $prize?->data['image']['img'] ?? $prize?->data['image']['thumb'] ?? $prize?->image ?? null;
                 $price = $bag->nominal ?? $prize?->product?->price ?? 0;
                 return [
-                    'name' => $prize?->name ?? $prize?->product?->name ?? 'Подарок',
+                    'name' => $prize?->product?->name ?? $prize?->name ?? 'Подарок',
                     'image' => $image,
                     'price' => (int)$price,
                 ];
             })->values())
             @php($catInBagGiftsTotal = $catInBagGifts->sum('price'))
             @if(getSettings('catInBag') && $order->confirm && $catInBagSession)
-              @if($catInBagHasUnopened)
+              <x-cat-bags :bag-count="$catInBagSession->bag_count" :open-limit="$catInBagSession->open_limit" :category-ids="$catInBagCategoryIds" :order-id="$order->id" :order-slug="$order->slug" />
+            @endif
+            @if(!isset($order->data['store_coupon'])||!$order->data['store_coupon'])
+              @if(getSettings('catInBag') && $order->confirm && $catInBagSession && $catInBagHasUnopened)
                 <div class="mb-12">
                   <x-cat-get-benefit />
                 </div>
               @endif
-              <x-cat-bags :bag-count="$catInBagSession->bag_count" :open-limit="$catInBagSession->open_limit" :category-ids="$catInBagCategoryIds" :order-id="$order->id" :order-slug="$order->slug" />
-            @endif
-            @if(!isset($order->data['store_coupon'])||!$order->data['store_coupon'])
               <div class="w-full">
                 <h2 class="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl uppercase mb-6">Товары</h2>
 

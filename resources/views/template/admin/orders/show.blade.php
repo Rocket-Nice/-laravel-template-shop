@@ -209,6 +209,9 @@
             </div>
           @endif
         </div>
+        @php
+          $openedCatBags = $catInBagSession?->bags->whereNotNull('opened_at')->values() ?? collect();
+        @endphp
         <div class="mx-auto py-4">
           <p class="mb-2"><strong>Корзина:</strong></p>
           <div class="relative overflow-x-auto">
@@ -248,48 +251,29 @@
                   <td class="border p-2">{{ formatPrice($item['price'] * $item['qty']) }}</td>
                 </tr>
               @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-        @if($catInBagSession && $catInBagSession->bags->whereNotNull('opened_at')->count())
-          @php
-            $openedCatBags = $catInBagSession->bags->whereNotNull('opened_at')->values();
-          @endphp
-          <div class="mx-auto py-4">
-            <p class="mb-2"><strong>Подарки «Кот в мешке»:</strong></p>
-            <div class="relative overflow-x-auto">
-              <table class="table-auto w-full text-center border-collapse border border-gray-200 rounded-md text-sm">
-                <thead>
-                <tr>
-                  <th class="bg-gray-100 border p-2 text-left">Наименование</th>
-                  <th class="bg-gray-100 border p-2">Артикул</th>
-                  <th class="bg-gray-100 border p-2">Количество</th>
-                  <th class="bg-gray-100 border p-2">Цена</th>
-                </tr>
-                </thead>
-                <tbody>
+              @if($openedCatBags->count())
                 @foreach($openedCatBags as $bag)
                   @php
                     $giftProduct = $bag->product ?? $bag->prize?->product;
-                    $giftName = $bag->prize?->name ?? $giftProduct?->name ?? 'Подарок';
-                    $giftPrice = 0;
+                    $giftName = $giftProduct?->name ?? $bag->prize?->name ?? 'Подарок';
                     if ($bag->prize_type === 'certificate' && empty($giftProduct?->name) && !empty($bag->nominal)) {
                       $giftName = 'Сертификат на ' . number_format($bag->nominal, 0, '.', ' ') . ' ₽';
                     }
                   @endphp
-                  <tr>
+                  <tr class="bg-gray-50">
                     <td class="border p-2 text-left">{{ $giftName }}</td>
                     <td class="border p-2">{{ $giftProduct?->article ?? $giftProduct?->sku ?? '' }}</td>
+                    <td class="border p-2"></td>
                     <td class="border p-2">1</td>
-                    <td class="border p-2">{{ formatPrice($giftPrice) }}</td>
+                    <td class="border p-2">{{ formatPrice(0) }}</td>
+                    <td class="border p-2">{{ formatPrice(0) }}</td>
                   </tr>
                 @endforeach
-                </tbody>
-              </table>
-            </div>
+              @endif
+              </tbody>
+            </table>
           </div>
-        @endif
+        </div>
         <div class="mx-auto">
           <div class="flex justify-end">
             <div class="w-full md:w-auto flex-initial">
@@ -427,7 +411,7 @@
                 @php
                   $isOpened = (bool)$bag->opened_at;
                   $giftCode = $bag->data['gift_code'] ?? ($bag->data['voucher_code'] ?? '');
-                  $giftName = $bag->prize?->name ?? $bag->prize?->product?->name ?? $bag->product?->name ?? '';
+                  $giftName = $bag->prize?->product?->name ?? $bag->product?->name ?? $bag->prize?->name ?? '';
                   if ($bag->prize_type === 'certificate' && empty($giftName) && !empty($bag->nominal)) {
                     $giftName = 'Сертификат на ' . number_format($bag->nominal, 0, '.', ' ') . ' ₽';
                   }

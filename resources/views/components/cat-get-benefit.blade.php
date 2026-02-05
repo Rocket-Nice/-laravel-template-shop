@@ -10,7 +10,7 @@
     <div class="w-full sm:w-[72%] lg:w-[70%] flex items-center relative max-h-[132px] md:max-h-[127px] h-full">
         <picture class="sticky md:absolute top-[-35px] left-0">
             <source media="(max-width: 576px)" srcset="/img/cat-bag/cat-get-bag-mobile.png">
-            <img src="/img/cat-bag/cat-get-bag.png" alt="cat" class="max-w-[96px] w-[96px] md:max-w-full md:w-auto h-auto">
+            <img src="/img/cat-bag/cat-get-bag.png" alt="cat" class="max-w-[96px] w-[96px] md:max-w-[128px] md:w-[128px] h-auto">
         </picture>
 
         <div class="w-[128px] hidden md:block"></div>

@@ -38,8 +38,8 @@ if (startBtn && sacksContainer) {
       return [];
     }
   })();
-  const catBagImage = "/img/cat-bag/gift-cat.png";
-  const goldenBagImage = "/img/cat-bag/gift-gold.png";
+  const catBagImage = "/img/cat-bag/cat-in-bag-animation.png";
+  const goldenBagImage = "/img/cat-bag/gift-gold-animation.png";
   const fallbackBagImage = "/img/cat-bag/animation-sack/sack.svg";
   const prizePlaceholderImage = "/img/cat-bag/animation-sack/product.svg";
   const preSackImages = [
@@ -117,6 +117,20 @@ if (startBtn && sacksContainer) {
 
   function isMobileDevice() {
     return window.innerWidth <= 600;
+  }
+
+  function markCatPopupOpenedOnce() {
+    window.__catPopupOpenedOnce = true;
+    try {
+      const formatter = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Moscow",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      });
+      const todayMsk = formatter.format(new Date());
+      localStorage.setItem("cat-popup-opened-date", todayMsk);
+    } catch (e) {}
   }
 
   function preloadPrizeImage(imageUrl) {
@@ -246,7 +260,15 @@ if (startBtn && sacksContainer) {
     }
     const limit = typeof openLimit === "number" ? openLimit : sackCards.length;
     const remaining = Math.max(0, limit - openedCount);
-    infoText.innerHTML = `осталось <span>${remaining}</span> из <span>${limit}</span> попыток`;
+    if (remaining === 0) {
+      infoText.textContent = "Не осталось попыток";
+      if (startBtn) {
+        startBtn.classList.add("hidden");
+        startBtn.disabled = true;
+      }
+    } else {
+      infoText.innerHTML = `осталось <span>${remaining}</span> из <span>${limit}</span> попыток`;
+    }
     if (cabinetBtn) {
       if (remaining === 0) {
         cabinetBtn.classList.remove("hidden");
@@ -308,8 +330,9 @@ if (startBtn && sacksContainer) {
       const prize = bag?.prize || null;
       const isEmpty = bag?.prize_type === "empty" || !prize;
       const title = isEmpty ? "Пусто" : (prize?.name || "Подарок");
+      const code = bag?.data?.gift_code || bag?.data?.voucher_code || "";
       const image = isEmpty ? "" : (prize?.image || prizePlaceholderImage);
-      const record = { bagId, title, image };
+      const record = { bagId, title: code || title, image };
       const existingIndex = bagId
         ? prizeHistory.findIndex(item => item.bagId === bagId)
         : -1;
@@ -340,7 +363,7 @@ if (startBtn && sacksContainer) {
       return categoryImages;
     }
     categoryImages = fromSession
-      .map((category) => category?.image_thumb || category?.image || null)
+      .map((category) => category?.image || category?.image_thumb || null)
       .filter(Boolean);
     if (!hasShuffled) {
       applyImages(getInitialImages());
@@ -740,6 +763,7 @@ if (startBtn && sacksContainer) {
     const openBagUrl = orderPath ? `${orderPath}/bag/${bagId}/open` : null;
     let prizeImageUrl = prizeImageUrlFallback;
     let prizeTitle = "Подарок";
+    let prizeCode = "";
     let isEmptyPrize = false;
     if (openBagUrl) {
       try {
@@ -754,6 +778,7 @@ if (startBtn && sacksContainer) {
         const data = await response.json();
         const prizeType = data?.bag?.prize_type || null;
         const prizeData = data?.bag?.prize || null;
+        prizeCode = data?.bag?.data?.gift_code || data?.bag?.data?.voucher_code || "";
         if (!prizeData || prizeType === "empty") {
           isEmptyPrize = true;
           prizeTitle = "Пусто";
@@ -788,6 +813,7 @@ if (startBtn && sacksContainer) {
 
           card.dataset.prizeImage = isEmptyPrize ? "" : prizeImageUrl;
           card.dataset.prizeTitle = prizeTitle;
+          card.dataset.prizeCode = prizeCode;
 
           const productTextElement = card.querySelector(".sack-product-text");
           if (productTextElement) {
@@ -803,9 +829,16 @@ if (startBtn && sacksContainer) {
 
           subtitle.textContent = "Ваша удача в акции";
 
-          startBtn.textContent = "Далее";
-          startBtn.classList.remove("hidden");
-          startBtn.disabled = false;
+          if (openedCount + 1 >= limit) {
+            startBtn.classList.add("hidden");
+            startBtn.disabled = true;
+            isNextMode = false;
+            currentOpenedCard = null;
+          } else {
+            startBtn.textContent = "Далее";
+            startBtn.classList.remove("hidden");
+            startBtn.disabled = false;
+          }
 
           isNextMode = true;
           currentOpenedCard = card;
@@ -854,12 +887,35 @@ if (startBtn && sacksContainer) {
     }
 
     const text = openedCard.dataset.prizeTitle || (productText ? productText.title || productText.textContent : "Подарок");
+    const code = openedCard.dataset.prizeCode || "";
     const productImageUrl = openedCard.dataset.prizeImage || prizePlaceholderImage;
     const bagId = openedCard.dataset.bagId;
 
-    const record = { bagId, title: text, image: productImageUrl };
+    const record = { bagId, title: code || text, image: productImageUrl };
     upsertPrizeRecord(record);
     persistPrizeHistory();
+  }
+
+  function restoreSelectionView() {
+    if (currentOpenedCard && sackCards.includes(currentOpenedCard)) {
+      returnToSelection(currentOpenedCard);
+      applyOpenedState();
+      updateInfoText();
+      return;
+    }
+
+    let hadHidden = false;
+    sackCards.forEach((card) => {
+      if (card.style.display === "none") {
+        hadHidden = true;
+      }
+      card.style.display = "block";
+    });
+    if (hadHidden) {
+      enableSelection();
+      applyOpenedState();
+      updateInfoText();
+    }
   }
 
   async function shuffleSacks() {
@@ -915,6 +971,8 @@ if (startBtn && sacksContainer) {
   });
 
   window.addEventListener("open-cat-bags", async () => {
+    markCatPopupOpenedOnce();
+    restoreSelectionView();
     const data = await loadSession(true);
     if (data) {
       syncSessionFromData(data);

@@ -87,7 +87,7 @@ class GameController extends Controller
             ->first();
 
         $orderData = $order->data ?? [];
-        $participated = (bool)($orderData['cat_in_bag_participated'] ?? false);
+        $participated = true;
         $isVoucherOrder = (bool)($orderData['is_voucher'] ?? false);
         $total = $this->resolveGoodsTotal($order, $orderData);
         $expectedTier = $this->resolveTier($total);
@@ -145,6 +145,7 @@ class GameController extends Controller
         $categories = [];
         if (!empty($session->visible_category_ids)) {
             $categories = CatInBagCategory::query()
+                ->dontCache()
                 ->whereIn('id', $session->visible_category_ids)
                 ->get()
                 ->map(function (CatInBagCategory $category) {

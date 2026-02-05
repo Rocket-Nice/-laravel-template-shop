@@ -190,7 +190,7 @@
           @if(!$cart->count()) style="display: none;"@endif>
       @csrf
       <div class="px-2 sm:px-4 md:px-8 lg:px-14 xl:px-16 py-12 md:py-14 lg:py-16 xl:py-[86px]">
-        <div class="flex flex-col-reverse justify-between lg:flex-row max-w-[480px] mx-auto lg:max-w-none">
+        <div class="flex flex-col-reverse justify-between lg:flex-row max-w-[480px] md:max-w-full mx-auto lg:max-w-none">
           <div class="w-full lg:max-w-[480px] space-y-12" id="order-form">
             <h3 class="d-headline-4 m-headline-3 text-center">Контактные данные</h3>
             <div class="space-y-12">

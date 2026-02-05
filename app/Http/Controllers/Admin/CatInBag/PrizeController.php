@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductType;
 use App\Services\CompressModule;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 class PrizeController extends Controller
@@ -76,7 +77,10 @@ class PrizeController extends Controller
 
         $prizes = $prizes->orderBy('created_at', 'desc')->paginate(50);
 
-        $categories = CatInBagCategory::orderBy('name')->get();
+        $categories = CatInBagCategory::query()
+            ->dontCache()
+            ->orderBy('name')
+            ->get();
 
         $seo = [
             'title' => 'Подарки «Кот в мешке»'
@@ -92,7 +96,11 @@ class PrizeController extends Controller
             mkdir(storage_path('app/public/photos' . $working_dir), 0777, true);
         }
 
-        $categories = CatInBagCategory::orderBy('name')->get();
+        $categories = CatInBagCategory::query()
+            ->dontCache()
+            ->where('is_enabled', true)
+            ->orderBy('name')
+            ->get();
         $productTypes = ProductType::orderBy('name')->get();
         $products = Product::select('id', 'sku', 'name', 'type_id')->orderBy('name')->get();
 
@@ -109,7 +117,11 @@ class PrizeController extends Controller
             'name' => 'required|string|max:255',
             'total_qty' => 'required|integer|min:0',
             'category_id' => 'required|exists:cat_in_bag_categories,id',
-            'product_id' => 'required|exists:products,id',
+            'product_id' => [
+                'required',
+                'exists:products,id',
+                Rule::unique('cat_in_bag_prizes', 'product_id'),
+            ],
             'image.img' => 'required|string',
             'image.thumb' => 'nullable|string',
         ]);
@@ -151,7 +163,12 @@ class PrizeController extends Controller
             mkdir(storage_path('app/public/photos' . $working_dir), 0777, true);
         }
 
-        $categories = CatInBagCategory::orderBy('name')->get();
+        $categories = CatInBagCategory::query()
+            ->dontCache()
+            ->where('is_enabled', true)
+            ->orWhere('id', $prize->category_id)
+            ->orderBy('name')
+            ->get();
         $productTypes = ProductType::orderBy('name')->get();
         $products = Product::select('id', 'sku', 'name', 'type_id')->orderBy('name')->get();
 
@@ -168,7 +185,11 @@ class PrizeController extends Controller
             'name' => 'required|string|max:255',
             'total_qty' => 'required|integer|min:0',
             'category_id' => 'required|exists:cat_in_bag_categories,id',
-            'product_id' => 'required|exists:products,id',
+            'product_id' => [
+                'required',
+                'exists:products,id',
+                Rule::unique('cat_in_bag_prizes', 'product_id')->ignore($prize->id),
+            ],
             'image.img' => 'nullable|string',
             'image.thumb' => 'nullable|string',
         ]);
