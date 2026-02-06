@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Schema;
 |
 */
 
+Route::get('/test-cat-popup', function() {
+  return view('test-cat-popup');
+});
+
 //Route::get('/test-memcached', function() {
 //  $key = 'test_key';
 //  $value = 'Hello, Memcached!';

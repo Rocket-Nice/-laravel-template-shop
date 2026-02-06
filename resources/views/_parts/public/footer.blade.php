@@ -95,7 +95,7 @@
         @if(getSettings('goldTicket'))
           <a href="{{ route('page', 'aktsiya_zolotoy_bilet') }}">Правила проведения рекламной акции «Золотой билет»</a>
         @endif
-        <a onclick="window.dispatchEvent(new CustomEvent('open-popup-own'))" class="transition">Информация об интеллектуальной собственности</a>
+        <a onclick="window.dispatchEvent(new CustomEvent('open-popup-own'))" class="transition cursor-pointer">Информация об интеллектуальной собственности</a>
       </nav>
       <div class="mt-6 flex flex-col lg:flex-row lg:space-x-12">
         <div>

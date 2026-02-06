@@ -24,6 +24,7 @@ module.exports = {
                 'inter_font': '"Inter", sans-serif',
                 'snell_roundhand_font': '"SnellRoundhand"',
                 'cormorant_sc_font': '"Cormorant SC"',
+                cormorant: ['Cormorant', 'serif'],
             },
             padding: {
                 '1.75': '0.4375rem',

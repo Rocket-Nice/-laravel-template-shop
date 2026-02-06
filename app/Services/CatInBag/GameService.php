@@ -3,6 +3,7 @@
 namespace App\Services\CatInBag;
 
 use App\Models\CatInBagBag;
+use App\Models\CatInBagPreview;
 use App\Models\CatInBagPrize;
 use App\Models\CatInBagSession;
 use App\Models\Voucher;
@@ -87,10 +88,16 @@ class GameService
             $bag->save();
 
             $session->opened_count = $openIndex;
+            $isCompleted = false;
             if ($session->opened_count >= $session->open_limit) {
                 $session->status = 'completed';
+                $isCompleted = true;
             }
             $session->save();
+
+            if ($isCompleted) {
+                $this->resetPreviewForUser($session->user_id);
+            }
 
             $bag->refresh();
             $this->createGiftVoucherIfNeeded($bag, $session);
@@ -98,6 +105,17 @@ class GameService
 
             return $bag->refresh();
         });
+    }
+
+    private function resetPreviewForUser(?int $userId): void
+    {
+        if (!$userId) {
+            return;
+        }
+
+        CatInBagPreview::query()
+            ->where('user_id', $userId)
+            ->delete();
     }
 
     private function assignPreparedPrizes(CatInBagSession $session): void
@@ -150,19 +168,32 @@ class GameService
         }
 
         if (!empty($bagsWithoutPrize)) {
-            $fallbackCandidates = CatInBagPrize::query()
-                ->with('product')
-                ->where('is_enabled', true)
-                ->whereColumn('total_qty', '>', 'used_qty')
-                ->when(!empty($usedProductIds), function ($query) use ($usedProductIds) {
-                    $query->whereNotIn('product_id', $usedProductIds);
-                })
-                ->get()
-                ->shuffle()
-                ->values();
-
             foreach ($bagsWithoutPrize as $bag) {
-                $fallbackPrize = $fallbackCandidates->shift();
+                $fallbackPrize = CatInBagPrize::query()
+                    ->with('product')
+                    ->where('is_enabled', true)
+                    ->whereColumn('total_qty', '>', 'used_qty')
+                    ->when($bag->type !== 'golden', function ($query) {
+                        $query->where('is_golden', false);
+                    })
+                    ->when(!empty($usedProductIds), function ($query) use ($usedProductIds) {
+                        $query->whereNotIn('product_id', $usedProductIds);
+                    })
+                    ->inRandomOrder()
+                    ->first();
+
+                if (!$fallbackPrize) {
+                    $fallbackPrize = CatInBagPrize::query()
+                        ->with('product')
+                        ->where('is_enabled', true)
+                        ->whereColumn('total_qty', '>', 'used_qty')
+                        ->when($bag->type !== 'golden', function ($query) {
+                            $query->where('is_golden', false);
+                        })
+                        ->inRandomOrder()
+                        ->first();
+                }
+
                 if (!$fallbackPrize) {
                     $bag->prize_type = 'empty';
                     $bag->save();
@@ -191,15 +222,18 @@ class GameService
         $this->ensureNoEmptyBags($bags, $usedProductIds);
 
         if ($assignedCount === 0 && $bags->isNotEmpty()) {
+            $fallbackBag = $bags->first();
             $fallbackPrize = CatInBagPrize::query()
                 ->with('product')
                 ->where('is_enabled', true)
                 ->whereColumn('total_qty', '>', 'used_qty')
+                ->when($fallbackBag && $fallbackBag->type !== 'golden', function ($query) {
+                    $query->where('is_golden', false);
+                })
                 ->inRandomOrder()
                 ->first();
 
             if ($fallbackPrize) {
-                $fallbackBag = $bags->first();
                 $fallbackBag->prize_id = $fallbackPrize->id;
                 $fallbackBag->product_id = $fallbackPrize->product_id;
                 $fallbackBag->prize_type = $fallbackPrize->is_certificate ? 'certificate' : 'product';
@@ -229,35 +263,43 @@ class GameService
             return $bag->prize_type === 'certificate';
         })->count();
 
-        $availableProducts = CatInBagPrize::query()
+        $allAvailableProducts = CatInBagPrize::query()
             ->with('product')
             ->where('is_enabled', true)
             ->where('is_certificate', false)
             ->whereColumn('total_qty', '>', 'used_qty')
             ->get();
 
-        $availableCertificates = CatInBagPrize::query()
+        $allAvailableCertificates = CatInBagPrize::query()
             ->with('product')
             ->where('is_enabled', true)
             ->where('is_certificate', true)
             ->whereColumn('total_qty', '>', 'used_qty')
             ->get();
 
-        $uniqueProducts = $availableProducts
-            ->when(!empty($usedProductIds), function ($query) use ($usedProductIds) {
-                return $query->whereNotIn('product_id', $usedProductIds);
-            })
-            ->shuffle()
-            ->values();
-
-        $uniqueCertificates = $availableCertificates
-            ->when(!empty($usedProductIds), function ($query) use ($usedProductIds) {
-                return $query->whereNotIn('product_id', $usedProductIds);
-            })
-            ->shuffle()
-            ->values();
-
         foreach ($emptyBags as $bag) {
+            $availableProducts = $bag->type === 'golden'
+                ? $allAvailableProducts
+                : $allAvailableProducts->where('is_golden', false)->values();
+
+            $availableCertificates = $bag->type === 'golden'
+                ? $allAvailableCertificates
+                : $allAvailableCertificates->where('is_golden', false)->values();
+
+            $uniqueProducts = $availableProducts
+                ->when(!empty($usedProductIds), function ($query) use ($usedProductIds) {
+                    return $query->whereNotIn('product_id', $usedProductIds);
+                })
+                ->shuffle()
+                ->values();
+
+            $uniqueCertificates = $availableCertificates
+                ->when(!empty($usedProductIds), function ($query) use ($usedProductIds) {
+                    return $query->whereNotIn('product_id', $usedProductIds);
+                })
+                ->shuffle()
+                ->values();
+
             $picked = $uniqueProducts->shift();
             if (!$picked && $certCount < 1) {
                 $picked = $uniqueCertificates->shift();
@@ -270,8 +312,11 @@ class GameService
                 $picked = $availableProducts->shuffle()->first();
             }
 
-            if (!$picked && $availableCertificates->isNotEmpty()) {
+            if (!$picked && $certCount < 1 && $availableCertificates->isNotEmpty()) {
                 $picked = $availableCertificates->shuffle()->first();
+                if ($picked) {
+                    $certCount++;
+                }
             }
 
             if (!$picked) {

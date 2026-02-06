@@ -106,42 +106,6 @@
                     target="_blank" class="md:w-full max-w-[357px]">Подписаться</x-public.primary-button>
             </div>
         @endif
-        <div id="review-alert" class="!px-4 !py-6 sm:!py-[60px] sm:!px-6 w-full max-w-[547px]" style="display: none">
-            <div class="m-text-body d-text-body text-center">
-                <div class="mb-6"><span class="cormorantInfant">250</span> бонусов на следующий заказ за отзыв на
-                    нашем сайте.</div>
-                <div>
-                    <x-public.primary-button type="button" onclick="Fancybox.close()">
-                        спасибо, обязательно напишу
-                    </x-public.primary-button>
-                </div>
-            </div>
-        </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Fancybox.show(
-                    [{
-                        src: '#review-alert',
-                        width: "900px",
-                        height: "700px",
-                    }, ], {
-                        closeButton: false,
-                        Toolbar: {
-                            display: {
-                                left: [],
-                                middle: [],
-                                right: [],
-                            },
-                        },
-                        loop: false,
-                        touch: false,
-                        contentClick: false,
-                        dragToClose: false,
-                    }
-                );
-            })
-        </script>
     @endif
     {{--  <script> --}}
     {{--    window.setCookie('goldticketShown', 'true', 1); --}}

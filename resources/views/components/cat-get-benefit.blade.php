@@ -8,10 +8,18 @@
     sm:mx-0
 ">
     <div class="w-full sm:w-[72%] lg:w-[70%] flex items-center relative max-h-[132px] md:max-h-[127px] h-full">
-        <picture class="sticky md:absolute top-[-35px] left-0">
-            <source media="(max-width: 576px)" srcset="/img/cat-bag/cat-get-bag-mobile.png">
-            <img src="/img/cat-bag/cat-get-bag.png" alt="cat" class="max-w-[96px] w-[96px] md:max-w-[128px] md:w-[128px] h-auto">
-        </picture>
+        <div class="sticky md:absolute top-[-35px] left-0">
+            <img 
+                src="/img/cat-bag/cat-get-bag.png" 
+                alt="cat"
+                class="max-w-[96px] w-[96px] md:max-w-[128px] md:w-[128px] h-auto hidden md:block"
+            >
+            <img 
+                src="/img/cat-bag/cat-get-bag-mobile.png" 
+                alt="cat"
+                class="max-w-[96px] w-[96px] h-auto block md:hidden"
+            >
+        </div>
 
         <div class="w-[128px] hidden md:block"></div>
         <div class="md:py-[25.5px] py-[16px] pl-0 md:pl-[8px] pr-[16px] md:pr-0 text-left">

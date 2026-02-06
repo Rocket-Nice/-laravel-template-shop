@@ -23,6 +23,7 @@ class GameController extends Controller
         if (is_float($value)) {
             return (int)round($value);
         }
+        
         if (is_numeric($value)) {
             return (int)round((float)$value);
         }
